@@ -58,7 +58,7 @@ export const PermissionFlags = {
 export type SentItem = string | harmony.MessagePayload | harmony.MessageOptions
 
 export type NormalMessage = harmony.Message & {
-  customData: any
+  customData: unknown
   args: { [name: string]: string | number } & (string[] | number[])
   positionalArgs: string[]
   triggerCoolDown: () => void
@@ -175,13 +175,13 @@ export interface CommandOptions<T extends keyof CommandMessageType> {
   /**
    * List of permissions required for the user to execute the command
    */
-  userPermissions?:
-    | (keyof typeof PermissionFlags)
-    | harmony.PermissionResolvable
+  requiredPermissions?:
+    | (keyof typeof PermissionFlags)[]
+    | harmony.PermissionResolvable[]
   /**
-   * List of roles allowed to execute this command (does not override userPermissions)
-   */
-  requiredRoles?: string[]
+   * List of roles allowed to execute this command (does not override requiredPermissions)
+  */
+  allowedRoles?: string[]
   /**
    * Function that will be executed when the command is triggered
    */
@@ -209,6 +209,15 @@ export interface CommandOptions<T extends keyof CommandMessageType> {
     role: string
     coolDown: number
   }[]
+
+  /**
+   * Runs before the `execute` function
+   * * You can set `message.customData` and retrieve it on `execute`, `onError` and `afterExecute`
+  */
+  beforeExecute?: (
+    this: CommandMessageType[T],
+    message: CommandMessageType[T],
+  ) => Promise<void>
   /**
    * Function that will be executed when the command is triggered
    */
@@ -228,9 +237,10 @@ export interface CommandOptions<T extends keyof CommandMessageType> {
 
   /**
    * Function that will be executed when the command fails to execute
-   * @param error - the error that was thrown
    */
   onError?: (
+    this: CommandMessageType[T],
+    message: CommandMessageType[T],
     error: unknown,
   ) => Promise<void> | void
 }
