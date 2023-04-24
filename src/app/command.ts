@@ -59,8 +59,8 @@ export type SentItem = string | harmony.MessagePayload | harmony.MessageOptions
 
 export type NormalMessage = harmony.Message & {
   customData: unknown
-  args: { [name: string]: string | number } & (string[] | number[])
-  positionalArgs: string[]
+  args: { [name: string]: string | number }
+  positionalArgs: {[key: string]: string | number}
   triggerCoolDown: () => void
   send: (
     this: NormalMessage,
@@ -155,6 +155,10 @@ export interface CommandOptions<T extends keyof CommandMessageType> {
     validate?: (value: any) => boolean
   }[]
   /**
+   * Instructions on how to use the command
+   */
+  usage?: string
+  /**
    * A interval in milliseconds between each use of the command by a user
    */
   coolDown?: number
@@ -217,14 +221,14 @@ export interface CommandOptions<T extends keyof CommandMessageType> {
   beforeExecute?: (
     this: CommandMessageType[T],
     message: CommandMessageType[T],
-  ) => Promise<void>
+  ) => Promise<void> | void
   /**
    * Function that will be executed when the command is triggered
    */
   execute: (
     this: CommandMessageType[T],
     message: CommandMessageType[T],
-  ) => Promise<void>
+  ) => Promise<void> | void
 
   /**
    * Function that will be executed after the command is executed
@@ -233,7 +237,7 @@ export interface CommandOptions<T extends keyof CommandMessageType> {
   afterExecute?: (
     this: CommandMessageType[T],
     message: CommandMessageType[T],
-  ) => Promise<void>
+  ) => Promise<void> | void
 
   /**
    * Function that will be executed when the command fails to execute
