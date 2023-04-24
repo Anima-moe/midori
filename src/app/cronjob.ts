@@ -32,7 +32,19 @@ export interface CustomCronjob {
    * Vixie Cron format
   */
   cron: string
+  /**
+   * Runs every time the cronjob is executed
+   * @param client 
+   * @param job 
+   * @returns 
+   */
   execute: (client: harmony.Client, job: CustomCronjob & { croner: Cron }) => void
+  /**
+   * If set to true the cronjob won't be automatically executed.
+   * 
+   * You can still start the cronjob manually by calling `jobs.resolve('name').croner.start()` or `job.croner.start()`
+   */
+  manual?: boolean
 }
 
 const handler = new Handler('src/job')
@@ -84,7 +96,8 @@ export const jobs = new (class CronjobCollection extends harmony.Collection<stri
         name: job.name,
         catch: job.onError,
         maxRuns: job.maxRuns,
-        unref: true
+        unref: true,
+        paused: job.manual,
       }, job.execute.bind(this, client))
       this.set(job.name, { ...job, croner: cron })
     }
