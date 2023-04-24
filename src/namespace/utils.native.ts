@@ -1,5 +1,6 @@
-import { harmony } from '@/deps.ts'
-import { CommandOptions } from '../app/command.ts'
+import { harmony, t } from '@/deps.ts'
+import { CommandOptions, NormalMessage } from '../app/command.ts'
+import Logger from '../app/core/logger.ts'
 
 export function isNormalMessage(
   message: harmony.Message,
@@ -86,4 +87,38 @@ export async function resolveEmoji(message: harmony.Message, emoji: string) {
   }
 
   return emoji
+}
+
+export async function sendErrorEmbed(
+  message: NormalMessage,
+  content?: string,
+  args?: { [key: string]: string | number }
+) {
+  const embed = await new harmony.Embed()
+    .setColor('RED')
+    .setDescription(t(message.locale, content || 'command.error.generic', args))
+  return await message.channel.send({ embeds: [embed] })
+}
+
+export async function sendSuccessEmbed(
+  message: NormalMessage,
+  content?: string,
+  args?: { [key: string]: string | number }
+) {
+  const embed = await new harmony.Embed()
+    .setColor('GREEN')
+    .setDescription(t(message.locale, content || 'command.success.generic', args))
+  return await message.channel.send({ embeds: [embed] })
+}
+
+export async function sendSafeMessage(
+  message: NormalMessage,
+  content: string,
+  args?: { [key: string]: string | number }
+) {
+  try {
+    return await message.channel.send(t(message.locale, content || 'command.success.generic', args))
+  } catch {
+    await sendErrorEmbed(message, content || 'command.error.generic')
+  }
 }

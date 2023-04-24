@@ -14,6 +14,8 @@ import {
   isNormalMessage,
   resolveArgument,
   resolvePositionalArgument,
+sendErrorEmbed,
+sendSuccessEmbed,
 } from '@/namespace/utils.native.ts'
 
 const logger = new Logger({
@@ -59,39 +61,53 @@ const event: EventListener<'messageCreate'> = {
   execute: async (message) => {
     if (!isNormalMessage(message)) return
 
+    const isSelfMention = new RegExp(`<@!?${message.client?.user?.id}>$`).test(message.content)
     const prefix = client.prefix.toString()
 
-    if (new RegExp(`<@!?${message.client?.user?.id}>$`).test(message.content)) {
-      return message.channel
-        .send({
-          embeds: [
-            new harmony.Embed()
-              .setColor(Deno.env.get('EMBED_COLOR') || '#57FF9A')
-              .setDescription(t(message.locale, 'commands.help.mention')),
-          ],
-        })
-        .catch((e) => {
-          logger.error(`Error sending message: ${e.message}`)
-        })
-    }
-
-    if (!message.content.startsWith(prefix)) return
+    if (!message.content.startsWith(prefix) && !isSelfMention) return
 
     const key = message.content.split(/\s+/)[0].slice(prefix.length)
     const cmd: Command<any> | undefined = commands.resolve(key)
 
     message.isFromBotOwner = message.author.id === Deno.env.get('BOT_OWNER')
-
-    message.isFromGuildOwner = message?.guild?.ownerID === message.author.id ||
-      message.guild?.ownerID === message.author.id
+    message.isFromGuildOwner = message?.guild?.ownerID === message.author.id || message.guild?.ownerID === message.author.id     
 
     message.locale =
       (await message?.member?.roles.array())?.find((role) =>
         role.name.startsWith('lang:')
       )?.name.replace('lang:', '') || Deno.env.get('BOT_DEFAULT_LOCALE') ||
       'en-US'
+      
+    if (isSelfMention) {
+      console.log('Mentioned midori')
+      return await sendSuccessEmbed(message, 'generic.mention', { prefix })
+    }
 
     if (!cmd) return
+
+    // Check if the user has all needed permissions
+    if (cmd.options.requiredPermissions) {
+      const hasPermissions = cmd.options.requiredPermissions.every((perm) =>
+        message.member?.permissions.has(perm)
+      ) || message.isFromBotOwner
+
+      if (!hasPermissions) {
+        return await sendErrorEmbed(message, 'command.error.noPermissions')
+      }
+    }
+
+    // check if the user has any of the needed roles
+    if (cmd.options?.allowedRoles) {
+      const userRoles = await message.member?.roles.array()
+      const hasRoles = cmd.options.allowedRoles.some((role) =>
+        userRoles?.some((r) => r.name === role)
+      ) || message.isFromBotOwner
+
+      if (!hasRoles) {
+        return await sendErrorEmbed(message, 'command.error.noRoles')
+      }
+    }
+
     const cleanContent = message.content.slice(prefix.length + key.length)
       .trim()
 
@@ -190,6 +206,11 @@ const event: EventListener<'messageCreate'> = {
         }
       } catch (e) {
         await message.reactions.removeAll()
+          .catch(() =>
+            logger.warn(
+              'Failed to remove reactions, it is possible that the original message was deleted',
+            )
+          )
         await message.addReaction('1077894898331697162')
           .catch(() =>
             logger.warn(
@@ -197,18 +218,7 @@ const event: EventListener<'messageCreate'> = {
             )
           )
 
-        return await message.send({
-          embeds: [
-            new harmony.Embed()
-              .setColor('RED')
-              .setDescription(
-                t(
-                  'pt-BR',
-                  e.message || 'commands.commands.error.command.generic',
-                ),
-              ),
-          ],
-        })
+        return await sendErrorEmbed(message)
       }
       await message.addReaction('a:bot_loading:1077896860456472598')
         .catch(() =>
@@ -216,14 +226,28 @@ const event: EventListener<'messageCreate'> = {
             'Failed to add a reaction, replace the emoji identificator on messageCreate.native event.',
           )
         )
-
+      await cmd.options?.beforeExecute?.bind(cmd)(message)
       cmd.options.execute.bind(cmd)(message)
-        .catch(cmd.options.onError)
+        .catch((e) => {
+          cmd.options.onError?.bind(cmd)(message, e)
+        })
         .then(() => {
+          message.reactions.removeAll()
+            .catch(() =>
+              logger.warn(
+                'Failed to remove reactions, it is possible that the original message was deleted',
+              )
+            )
+          message.addReaction('a:bot_loaded:1077896425570046044')
+            .catch(() =>
+              logger.warn(
+                'Failed to add a reaction, replace the emoji identificator on messageCreate.native event.',
+              )
+            )
           cmd.options.afterExecute?.bind(cmd)(message)
         })
     } catch (e) {
-      logger.error(`Error while executing command ${cmd.options.name}`)
+      logger.error(`Error while handling command ${cmd.options.name} execution`)
       console.error(e)
       await message.reactions.removeAll()
       await message.addReaction('1077894898331697162')
@@ -233,6 +257,11 @@ const event: EventListener<'messageCreate'> = {
           )
         )
       await message.channel.send(e.message)
+        .catch(() => {
+          logger.warn(
+            'Failed to send a message, it is possible that the original message was deleted',
+          )
+        })
     }
   },
 }
