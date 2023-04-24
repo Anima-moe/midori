@@ -67,7 +67,7 @@ const event: EventListener<'messageCreate'> = {
           embeds: [
             new harmony.Embed()
               .setColor(Deno.env.get('EMBED_COLOR') || '#57FF9A')
-              .setDescription('commands.help.mention'),
+              .setDescription(t(message.locale, 'commands.help.mention')),
           ],
         })
         .catch((e) => {
@@ -88,7 +88,7 @@ const event: EventListener<'messageCreate'> = {
     message.locale =
       (await message?.member?.roles.array())?.find((role) =>
         role.name.startsWith('lang:')
-      )?.name.replace(':lang', '') || Deno.env.get('BOT_DEFAULT_LOCALE') ||
+      )?.name.replace('lang:', '') || Deno.env.get('BOT_DEFAULT_LOCALE') ||
       'en-US'
 
     if (!cmd) return
