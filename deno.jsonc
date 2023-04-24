@@ -1,0 +1,24 @@
+{
+  "imports": {
+    "@/": "./src/",
+    "std/path": "https://deno.land/std@0.184.0/path/mod.ts",
+    "std/console": "https://deno.land/std@0.184.0/console/mod.ts"
+  },
+  "tasks": {
+    "start": "deno run --allow-ffi --allow-run --allow-env --allow-net --allow-read --allow-write --unstable --import-map=deno.jsonc --watch src/main.ts",
+    "watch": "deno run --watch --allow-run --allow-ffi --allow-env --allow-net --allow-read --allow-write --unstable --import-map=deno.jsonc src/main.ts"
+  },
+  "fmt": {
+    "options": {
+      "semiColons": false,
+      "singleQuote": true,
+      "indentWidth": 2
+    }
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"],
+      "exclude": ["no-explicit-any"]
+    }
+  }
+}
