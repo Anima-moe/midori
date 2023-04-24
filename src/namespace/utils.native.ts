@@ -75,20 +75,6 @@ export function resolvePositionalArgument(
   return resolvedArgs
 }
 
-export async function resolveEmoji(message: harmony.Message, emoji: string) {
-  if (emoji.match(/<a?:\w+:\d+>/)) {
-    const emojiId = emoji.match(/\d+/)?.[0]
-    if (!emojiId) return emoji
-
-    const solvedEmoji = await message.guild?.emojis.resolve(emojiId)
-    if (!solvedEmoji) return emoji
-
-    return solvedEmoji
-  }
-
-  return emoji
-}
-
 export async function sendErrorEmbed(
   message: NormalMessage,
   content?: string,
@@ -111,7 +97,7 @@ export async function sendSuccessEmbed(
   return await message.channel.send({ embeds: [embed] })
 }
 
-export async function sendSafeMessage(
+export async function safeSendMessage(
   message: NormalMessage,
   content: string,
   args?: { [key: string]: string | number }
@@ -120,5 +106,26 @@ export async function sendSafeMessage(
     return await message.channel.send(t(message.locale, content || 'command.success.generic', args))
   } catch {
     await sendErrorEmbed(message, content || 'command.error.generic')
+  }
+}
+
+export async function safeRemoveReactions(
+  message: NormalMessage
+) {
+  try {
+    await message.reactions.removeAll()
+  } catch {
+    return await sendErrorEmbed(message, 'command.error.generic')
+  }
+}
+
+export async function safeAddReaction(
+  message: NormalMessage,
+  emoji: string
+) {
+  try {
+    await message.addReaction(emoji)
+  } catch {
+    return await sendErrorEmbed(message, 'command.error.generic')
   }
 }

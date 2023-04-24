@@ -14,8 +14,11 @@ import {
   isNormalMessage,
   resolveArgument,
   resolvePositionalArgument,
+safeAddReaction,
+safeRemoveReactions,
 sendErrorEmbed,
 sendSuccessEmbed,
+safeSendMessage
 } from '@/namespace/utils.native.ts'
 
 const logger = new Logger({
@@ -70,7 +73,10 @@ const event: EventListener<'messageCreate'> = {
     const cmd: Command<any> | undefined = commands.resolve(key)
 
     message.isFromBotOwner = message.author.id === Deno.env.get('BOT_OWNER')
-    message.isFromGuildOwner = message?.guild?.ownerID === message.author.id || message.guild?.ownerID === message.author.id     
+    message.isFromGuildOwner = message?.guild?.ownerID === message.author.id || message.guild?.ownerID === message.author.id
+    message.args = {}
+    message.positionalArgs = {}
+     
 
     message.locale =
       (await message?.member?.roles.array())?.find((role) =>
@@ -84,6 +90,33 @@ const event: EventListener<'messageCreate'> = {
     }
 
     if (!cmd) return
+
+    message.triggerCoolDown = async () => {
+      if (cmd.options.globalCoolDown) {
+        globalCoolDownCache.set(
+          `${cmd.options.name}`,
+          dayjs.unix(cmd.options.globalCoolDown),
+        )
+      }
+
+      if (cmd.options.coolDown) {
+        coolDownCache.set(
+          `${message.author.id}.${cmd.options.name}`,
+          dayjs().add(cmd.options.coolDown, 'milliseconds'),
+        )
+      }
+
+      if (cmd.options.roleCoolDown) {
+        const userRoles = (await message?.member?.roles.array())?.map(
+          (role) => role.name.toLowerCase(),
+        )
+        const roleCD = resolveRoleCoolDown(userRoles, cmd.options)
+        coolDownCache.set(
+          `${message.author.id}.${cmd.options.name}`,
+          dayjs().add(roleCD, 'milliseconds'),
+        )
+      }
+    }
 
     // Check if the user has all needed permissions
     if (cmd.options.requiredPermissions) {
@@ -111,65 +144,43 @@ const event: EventListener<'messageCreate'> = {
     const cleanContent = message.content.slice(prefix.length + key.length)
       .trim()
 
+    // TRY EVERYTHING
     try {
-      const parsedArgs = argParser(cleanContent)
-      const positionalObject = resolvePositionalArgument(
-        parsedArgs._,
-        cmd.options.positionalArgs,
-      )
-      const argsObject = resolveArgument(parsedArgs, cmd.options.args)
-
-      parsedArgs._.forEach((arg, index) => {
-        const cmdPositionals = cmd.options.positionalArgs
-        const reference = cmdPositionals?.[index]
-
-        if (reference) {
-          positionalObject[reference.name] = arg
-        }
-      })
-
-      // @ts-expect-error - This is an extension to the default typings, but it's not a problem.
-      message.positionalArgs = positionalObject
-
-      // @ts-expect-error - This is an extension to the default typings, but it's not a problem.
-      message.args = argsObject
-
-      if (parsedArgs.help || parsedArgs.h || positionalObject.help) {
-        return await message.channel.send({
-          embeds: [
-            new harmony.Embed()
-              .setColor(Deno.env.get('EMBED_COLOR') || '#57FF9A')
-              .setDescription('HELP FUNCTION'),
-          ],
+      try {
+        const parsedArgs = argParser(cleanContent)
+        const positionalObject = resolvePositionalArgument(
+          parsedArgs._,
+          cmd.options.positionalArgs,
+        )
+        const argsObject = resolveArgument(parsedArgs, cmd.options.args)
+  
+        parsedArgs._.forEach((arg, index) => {
+          const cmdPositionals = cmd.options.positionalArgs
+          const reference = cmdPositionals?.[index]
+  
+          if (reference) {
+            positionalObject[reference.name] = arg
+          }
         })
+
+        message.positionalArgs = positionalObject
+        message.args = argsObject
+  
+        if (parsedArgs.help || parsedArgs.h || positionalObject.help) {
+          return await message.channel.send({
+            embeds: [
+              new harmony.Embed()
+                .setColor(Deno.env.get('EMBED_COLOR') || '#57FF9A')
+                .setDescription('HELP FUNCTION'),
+            ],
+          })
+        }
+      } catch (e) {
+        await safeRemoveReactions(message)
+        await safeAddReaction(message, ':bot_fail:1077894898331697162')
+        await sendErrorEmbed(message, e.message)
       }
 
-      message.triggerCoolDown = async () => {
-        if (cmd.options.globalCoolDown) {
-          globalCoolDownCache.set(
-            `${cmd.options.name}`,
-            dayjs.unix(cmd.options.globalCoolDown),
-          )
-        }
-
-        if (cmd.options.coolDown) {
-          coolDownCache.set(
-            `${message.author.id}.${cmd.options.name}`,
-            dayjs().add(cmd.options.coolDown, 'milliseconds'),
-          )
-        }
-
-        if (cmd.options.roleCoolDown) {
-          const userRoles = (await message?.member?.roles.array())?.map(
-            (role) => role.name.toLowerCase(),
-          )
-          const roleCD = resolveRoleCoolDown(userRoles, cmd.options)
-          coolDownCache.set(
-            `${message.author.id}.${cmd.options.name}`,
-            dayjs().add(roleCD, 'milliseconds'),
-          )
-        }
-      }
 
       message.send = async function (
         this: NormalMessage,
@@ -178,6 +189,7 @@ const event: EventListener<'messageCreate'> = {
         return await this.channel.send(sent)
       }.bind(message)
 
+      // TRY COOLDOWN
       try {
         if (
           (cmd.options.coolDown || cmd.options.roleCoolDown) &&
@@ -205,63 +217,29 @@ const event: EventListener<'messageCreate'> = {
           }
         }
       } catch (e) {
-        await message.reactions.removeAll()
-          .catch(() =>
-            logger.warn(
-              'Failed to remove reactions, it is possible that the original message was deleted',
-            )
-          )
-        await message.addReaction('1077894898331697162')
-          .catch(() =>
-            logger.warn(
-              'Failed to add a reaction, replace the emoji identificator on messageCreate.native event.',
-            )
-          )
-
+        await safeRemoveReactions(message)
+        await safeAddReaction(message, '1077894898331697162')
         return await sendErrorEmbed(message)
       }
-      await message.addReaction('a:bot_loading:1077896860456472598')
-        .catch(() =>
-          logger.warn(
-            'Failed to add a reaction, replace the emoji identificator on messageCreate.native event.',
-          )
-        )
+
+      await safeAddReaction(message, 'a:bot_loading:1077896860456472598')
       await cmd.options?.beforeExecute?.bind(cmd)(message)
+
       cmd.options.execute.bind(cmd)(message)
-        .catch((e) => {
-          cmd.options.onError?.bind(cmd)(message, e)
+        ?.then(async () => {
+          await safeRemoveReactions(message)
+          await safeAddReaction(message, 'a:bot_loaded:1077896425570046044')
+          await cmd.options.afterExecute?.bind(cmd)(message)
         })
-        .then(() => {
-          message.reactions.removeAll()
-            .catch(() =>
-              logger.warn(
-                'Failed to remove reactions, it is possible that the original message was deleted',
-              )
-            )
-          message.addReaction('a:bot_loaded:1077896425570046044')
-            .catch(() =>
-              logger.warn(
-                'Failed to add a reaction, replace the emoji identificator on messageCreate.native event.',
-              )
-            )
-          cmd.options.afterExecute?.bind(cmd)(message)
+        ?.catch((e) => {
+          cmd.options.onError?.bind(cmd)(message, e)
         })
     } catch (e) {
       logger.error(`Error while handling command ${cmd.options.name} execution`)
       console.error(e)
       await message.reactions.removeAll()
-      await message.addReaction('1077894898331697162')
-        .catch(() =>
-          logger.warn(
-            'Failed to add a reaction, replace the emoji identificator on messageCreate.native event.',
-          )
-        )
-      await message.channel.send(e.message)
-        .catch(() => {
-          logger.warn(
-            'Failed to send a message, it is possible that the original message was deleted',
-          )
-        })
+      await safeAddReaction(message, '1077894898331697162')
+      await sendErrorEmbed(message)
     }
   },
 }
