@@ -113,6 +113,18 @@ export interface CommandOptions<T extends keyof CommandMessageType> {
   aliases?: string[]
   /**
    * Command arguments
+   * @example
+   * args: [
+   * { name: 'name', flag: 'n', required: true },
+   * { name: 'age', flag: 'a', validate: (value) => value > 0 }
+   * ]
+   * // Which ends up being used like this:
+   * !command -n "John Doe" -a 20
+   * // or
+   * !command --name "John Doe" --age 20
+   *
+   * // returns in the message context object:
+   * message.args.name // "John Doe"
    */
   args?: {
     name: string
@@ -123,6 +135,19 @@ export interface CommandOptions<T extends keyof CommandMessageType> {
   }[]
   /**
    * Arguments ordered by position
+   * * If a argument is required, it must be placed before any optional argument
+   * @example
+   * positionalArgs: [
+   *  { name: 'name', required: true },
+   *  { name: 'age', validate: (value) => value > 0 }
+   * ]
+   *
+   * // Which ends up being used like this:
+   * !command "John Doe" 20
+   *
+   * * // returns in the message context object:
+   * message.positionalArgs.name // "John Doe"
+   * message.positionalArgs.age // 20
    */
   positionalArgs?: {
     name: string
@@ -239,10 +264,8 @@ handler.on('load', async (filePath) => {
     }
     logger.success(
       `Loaded ${
-        commandFileName.includes('.native')
-          ? crayon.green('native')
-          : crayon.bgLightYellow('custom')
-      } command "${crayon.lightCyan(command.default.options.name)}" - ${
+        commandFileName.includes('.native') ? crayon.green('native ') : ''
+      }command "${crayon.lightCyan(command.default.options.name)}" - ${
         crayon.lightBlack(command.default.options.description)
       }`,
     )
@@ -277,7 +300,7 @@ export function validateCommand<
 
   // CoolDown is set, but never called.
   if (
-    command.options?.coolDown && !command.toString().includes('triggerCoolDown')
+    (command.options?.coolDown || command.options.roleCoolDown || command.options.globalCoolDown) && !command.toString().includes('triggerCoolDown')
   ) {
     logger.warn(
       `triggerCoolDown is never called on ${command.options.name}.execute`,
