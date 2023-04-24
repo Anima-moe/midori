@@ -5,9 +5,9 @@ const cron: CustomCronjob = {
   description: 'Example cronjob',
   cron: '*/5 * * * * *',
   manual: true,
-  execute: (_client , _this) => {
+  execute: (_client, _this) => {
     console.log('Example cronjob')
-  }
+  },
 }
 
 export default cron

@@ -1,4 +1,4 @@
-import "https://deno.land/x/dotenv@v3.2.2/load.ts"
+import 'https://deno.land/x/dotenv@v3.2.2/load.ts'
 
 import commandHandler from '@/app/command.ts'
 import cronjobHandler from '@/app/cronjob.ts'

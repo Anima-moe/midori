@@ -4,7 +4,7 @@ export default {
     command: {
       coolDown: 'Você está em cooldown, tente novamente em {time}.',
       generic: 'Ocorreu um erro ao executar o comando.',
-    }
+    },
   },
   commands: {
     help: {
@@ -12,6 +12,6 @@ export default {
     },
     ping: {
       pong: 'Pong! {latency}ms',
-    }
+    },
   },
 }

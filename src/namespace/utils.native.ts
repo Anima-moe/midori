@@ -84,6 +84,6 @@ export async function resolveEmoji(message: harmony.Message, emoji: string) {
 
     return solvedEmoji
   }
-  
+
   return emoji
 }

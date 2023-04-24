@@ -1,7 +1,7 @@
 import { resolve } from 'std/path'
 import Logger from '@/app/core/logger.ts'
 import { Handler } from '@/app/core/handler.ts'
-import { crayon, harmony, Cron } from '@/deps.ts'
+import { crayon, Cron, harmony } from '@/deps.ts'
 import { client } from './client.ts'
 
 const logger = new Logger({
@@ -14,34 +14,37 @@ export interface CustomCronjob {
   description: string
   /**
    * Whether the cronjob should be executed immediately after loading
-  */
+   */
   immediate?: boolean
   /**
    * Limits the number of times the cronjob can be executed (persists until restart)
-   * 
+   *
    * If not set, the cronjob will be executed indefinitely (expected behavior)
-  */
+   */
   maxRuns?: number
 
   onError?: (error: unknown) => void
   /**
-    * Timezone in Europe/Stockholm format
-  */
+   * Timezone in Europe/Stockholm format
+   */
   timezone?: string
   /**
    * Vixie Cron format
-  */
+   */
   cron: string
   /**
    * Runs every time the cronjob is executed
-   * @param client 
-   * @param job 
-   * @returns 
+   * @param client
+   * @param job
+   * @returns
    */
-  execute: (client: harmony.Client, job: CustomCronjob & { croner: Cron }) => void
+  execute: (
+    client: harmony.Client,
+    job: CustomCronjob & { croner: Cron },
+  ) => void
   /**
    * If set to true the cronjob won't be automatically executed.
-   * 
+   *
    * You can still start the cronjob manually by calling `jobs.resolve('name').croner.start()` or `job.croner.start()`
    */
   manual?: boolean
@@ -55,7 +58,9 @@ handler.on('load', async (filePath) => {
   const jobFileName = filePath.split('\\').slice(-1)[0].replace('.ts', '')
 
   if (!job.default) {
-    logger.error(`The cronjob file ${jobBreadcrumb} needs to export Cron instance as default`,)
+    logger.error(
+      `The cronjob file ${jobBreadcrumb} needs to export Cron instance as default`,
+    )
     return
   }
 
@@ -77,12 +82,13 @@ handler.on('finish', () => {
   jobs.start(client)
 })
 
-export const jobs = new (class CronjobCollection extends harmony.Collection<string, CustomCronjob & { croner: Cron }> {
+export const jobs =
+  new (class CronjobCollection
+    extends harmony.Collection<string, CustomCronjob & { croner: Cron }> {
     public validate(job: CustomCronjob) {
       if (!job.name) throw new Error('Cronjob name is required')
       if (!job.cron) throw new Error('Cronjob cron is required')
       if (!job.execute) throw new Error('Cronjob execute is required')
-
     }
 
     public resolve(name: string) {
@@ -109,10 +115,10 @@ export const jobs = new (class CronjobCollection extends harmony.Collection<stri
         }
 
         logger.info(
-          `Starting job "${crayon.lightCyan(job.name)}" - ${crayon.lightBlack(job.cron)}`,
+          `Starting job "${crayon.lightCyan(job.name)}" - ${
+            crayon.lightBlack(job.cron)
+          }`,
         )
-        
-
       })
     }
   })()

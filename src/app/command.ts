@@ -71,7 +71,7 @@ export type NormalMessage = harmony.Message & {
   client: harmony.Client
   /**
    * Locale key for translation
-   * 
+   *
    * This value is set based on the author roles prefixed by `lang:` ex: American English role would be `lang:en-US`
    * @default .env BOT_LOCALE
    */
@@ -186,7 +186,7 @@ export interface CommandOptions<T extends keyof CommandMessageType> {
   }[]
   /**
    * Function that will be executed when the command is triggered
-  */
+   */
   execute: (
     this: CommandMessageType[T],
     message: CommandMessageType[T],
@@ -195,7 +195,7 @@ export interface CommandOptions<T extends keyof CommandMessageType> {
   /**
    * Function that will be executed after the command is executed
    * @param message - the message that triggered the command
-  */
+   */
   afterExecute?: (
     this: CommandMessageType[T],
     message: CommandMessageType[T],
@@ -204,11 +204,10 @@ export interface CommandOptions<T extends keyof CommandMessageType> {
   /**
    * Function that will be executed when the command fails to execute
    * @param error - the error that was thrown
-  */
+   */
   onError?: (
-    error: unknown
+    error: unknown,
   ) => Promise<void> | void
-
 }
 
 export class Command<T extends keyof CommandMessageType = 'all'> {

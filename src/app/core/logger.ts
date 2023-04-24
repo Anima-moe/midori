@@ -64,11 +64,22 @@ export default class Logger {
     const padding = stampMaxSize - stampSize
     const spaces = padding > 0 ? ' '.repeat(padding) : ''
 
-    if (level === 1) return crayon.cyan(this.options.prefix  + spaces) + crayon.lightBlack(' > ')
-    if (level === 2) return crayon.rgb(226, 135, 67)(this.options.prefix + spaces) + crayon.lightBlack(' > ')
-    if (level === 3) return crayon.lightRed(this.options.prefix  + spaces) + crayon.lightBlack(' > ')
-    if (level === 4) return crayon.green(this.options.prefix  + spaces) + crayon.lightBlack(' > ')
-
+    if (level === 1) {
+      return crayon.cyan(this.options.prefix + spaces) +
+        crayon.lightBlack(' > ')
+    }
+    if (level === 2) {
+      return crayon.rgb(226, 135, 67)(this.options.prefix + spaces) +
+        crayon.lightBlack(' > ')
+    }
+    if (level === 3) {
+      return crayon.lightRed(this.options.prefix + spaces) +
+        crayon.lightBlack(' > ')
+    }
+    if (level === 4) {
+      return crayon.green(this.options.prefix + spaces) +
+        crayon.lightBlack(' > ')
+    }
 
     return crayon.bgLightCyan(this.options.prefix)
   }
@@ -82,13 +93,14 @@ export default class Logger {
     const iconSize = unicodeWidth(stripColor(icon))
     const prefixSize = unicodeWidth(stripColor(this._prefix(level)))
 
-    const totalSpaces = columns - messageSize - stampSize - iconSize - prefixSize - 2
+    const totalSpaces = columns - messageSize - stampSize - iconSize -
+      prefixSize - 2
     return this._prefix(level) + ' ' +
       this._message(message) +
       (totalSpaces > 0
         ? ' '.repeat(totalSpaces)
         : '\n' + ' '.repeat(columns - stampSize - prefixSize)) +
-        this._stamp()
+      this._stamp()
   }
 
   public debug(message: any) {

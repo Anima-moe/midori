@@ -85,7 +85,11 @@ const event: EventListener<'messageCreate'> = {
     message.isFromGuildOwner = message?.guild?.ownerID === message.author.id ||
       message.guild?.ownerID === message.author.id
 
-    message.locale = (await message?.member?.roles.array())?.find((role) => role.name.startsWith('lang:'))?.name.replace(':lang', '') || Deno.env.get('BOT_DEFAULT_LOCALE') || 'en-US'
+    message.locale =
+      (await message?.member?.roles.array())?.find((role) =>
+        role.name.startsWith('lang:')
+      )?.name.replace(':lang', '') || Deno.env.get('BOT_DEFAULT_LOCALE') ||
+      'en-US'
 
     if (!cmd) return
     const cleanContent = message.content.slice(prefix.length + key.length)
@@ -187,28 +191,47 @@ const event: EventListener<'messageCreate'> = {
       } catch (e) {
         await message.reactions.removeAll()
         await message.addReaction('1077894898331697162')
-          .catch(()=> logger.warn('Failed to add a reaction, replace the emoji identificator on messageCreate.native event.'))
-        
+          .catch(() =>
+            logger.warn(
+              'Failed to add a reaction, replace the emoji identificator on messageCreate.native event.',
+            )
+          )
+
         return await message.send({
           embeds: [
             new harmony.Embed()
               .setColor('RED')
-              .setDescription(t('pt-BR', e.message || 'commands.commands.error.command.generic')),
+              .setDescription(
+                t(
+                  'pt-BR',
+                  e.message || 'commands.commands.error.command.generic',
+                ),
+              ),
           ],
         })
       }
       await message.addReaction('a:bot_loading:1077896860456472598')
-        .catch(()=> logger.warn('Failed to add a reaction, replace the emoji identificator on messageCreate.native event.'))
-        
+        .catch(() =>
+          logger.warn(
+            'Failed to add a reaction, replace the emoji identificator on messageCreate.native event.',
+          )
+        )
+
       cmd.options.execute.bind(cmd)(message)
         .catch(cmd.options.onError)
-        .then(()=>{ cmd.options.afterExecute?.bind(cmd)(message) })
+        .then(() => {
+          cmd.options.afterExecute?.bind(cmd)(message)
+        })
     } catch (e) {
       logger.error(`Error while executing command ${cmd.options.name}`)
       console.error(e)
       await message.reactions.removeAll()
       await message.addReaction('1077894898331697162')
-        .catch(()=> logger.warn('Failed to add a reaction, replace the emoji identificator on messageCreate.native event.'))
+        .catch(() =>
+          logger.warn(
+            'Failed to add a reaction, replace the emoji identificator on messageCreate.native event.',
+          )
+        )
       await message.channel.send(e.message)
     }
   },
