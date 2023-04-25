@@ -2,6 +2,8 @@ import Logger from '@/app/core/logger.ts'
 import { Handler } from '@/app/core/handler.ts'
 import { crayon, harmony } from '@/deps.ts'
 import { resolve } from 'https://deno.land/std@0.176.0/path/win32.ts'
+import { Translations } from "https://deno.land/x/t_i18n@2.1.0/mod.ts"
+import ptBR from "../language/pt-BR.ts";
 
 // https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags
 export const PermissionFlags = {
@@ -58,7 +60,7 @@ export const PermissionFlags = {
 export type SentItem = string | harmony.MessagePayload | harmony.MessageOptions
 
 export type NormalMessage = harmony.Message & {
-  customData: unknown
+  customData: any
   args: { [name: string]: string | number }
   positionalArgs: {[key: string]: string | number}
   triggerCoolDown: () => void
@@ -102,11 +104,11 @@ export interface CommandOptions<T extends keyof CommandMessageType> {
   /**
    * Brief description of what the command does
    */
-  description: string
+  description: Translations<typeof ptBR>
   /**
    * Longer description shown when the command is used with the help flag
    */
-  longDescription?: string
+  longDescription?: Translations<typeof ptBR>
   /**
    * Command aliases (alternative names)
    */
@@ -130,6 +132,7 @@ export interface CommandOptions<T extends keyof CommandMessageType> {
     name: string
     flag: string
     required?: boolean
+    description?: Translations<typeof ptBR>
     default?: any
     validate?: (value: any) => boolean
   }[]
@@ -153,6 +156,7 @@ export interface CommandOptions<T extends keyof CommandMessageType> {
     name: string
     required?: boolean
     validate?: (value: any) => boolean
+    description?: Translations<typeof ptBR>
   }[]
   /**
    * Instructions on how to use the command
