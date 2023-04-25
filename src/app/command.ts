@@ -103,16 +103,30 @@ export interface CommandOptions<T extends keyof CommandMessageType> {
   name: string
   /**
    * Brief description of what the command does
+   * 
+   * * You can use dot notation to automatically translate this to the user's locale
+   * 
    */
   description: Translations<typeof ptBR>
   /**
    * Longer description shown when the command is used with the help flag
+   *
+   * * You can use dot notation to automatically translate this to the user's locale
+   * 
    */
   longDescription?: Translations<typeof ptBR>
   /**
    * Command aliases (alternative names)
    */
   aliases?: string[]
+  /**
+   * Command category, defaults to generic
+   * 
+   * * You can use dot notation to automatically translate this to the user's locale
+   * 
+   * @default "generic"
+  */
+  category?: string
   /**
    * Command arguments
    * @example
@@ -318,7 +332,16 @@ export function validateCommand<
 
   // CoolDown is set, but never called.
   if (
-    (command.options?.coolDown || command.options.roleCoolDown || command.options.globalCoolDown) && !command.toString().includes('triggerCoolDown')
+    (
+      command.options?.coolDown || 
+      command.options.roleCoolDown || 
+      command.options.globalCoolDown
+    ) 
+    && 
+    (
+      !command.options.execute.toString().includes('triggerCoolDown()') &&
+      !command.options.afterExecute?.toString().includes('triggerCoolDown()')
+    )
   ) {
     logger.warn(
       `triggerCoolDown is never called on ${command.options.name}.execute`,
