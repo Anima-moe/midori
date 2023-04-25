@@ -3,7 +3,7 @@ import { dayjs, harmony, t } from '@/deps.ts'
 
 const Ping = new Command({
   name: 'ping',
-  description: 'Pong!',
+  description: 'command.ping.description',
   aliases: ['latency'],
   coolDown: 1000 * 4,
   execute: async (message) => {
