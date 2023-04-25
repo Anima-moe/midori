@@ -12,8 +12,10 @@ const Ping = new Command({
       .setDescription(t(message.locale, 'command.ping.reply', { latency: message.client.gateway.ping, processing: dayjs(dayjs().unix() - dayjs(message.timestamp).unix()).millisecond() }))
       
     await message.channel.send(embed)
-    await message.triggerCoolDown()
   },
+  afterExecute: async (message) => {
+    await message.triggerCoolDown()
+  }
 })
 
 export default Ping
