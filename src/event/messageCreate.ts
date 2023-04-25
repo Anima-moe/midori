@@ -29,7 +29,7 @@ const event: EventListener<'messageCreate'> = {
     if (message.content.startsWith(client.prefix.toString())) { return }
 
     // TEST FOR KEYWORD MATCH/SIMILARITY
-    // if similarity is above 0.7, send the keyword response
+    // if similarity is above 0.5, send the keyword response
     if (keywordCache.get('keywordList').length === 0) {
       const keywordList = orm.findMany(Keyword, {})
       keywordCache.set('keywordList', keywordList)
@@ -41,7 +41,7 @@ const event: EventListener<'messageCreate'> = {
       if (!keywordTest) continue
       const similarity = stringSimilarity.compareTwoStrings(message.content.toLowerCase(), keywordTest.toLowerCase())
   
-      if (similarity > 0.7) {
+      if (similarity > 0.5) {
         safeSendMessage(message, keyword.response)
       }
     }
