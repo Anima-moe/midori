@@ -129,9 +129,9 @@ const event: EventListener<'messageCreate'> = {
 
     // Check if the user has all needed permissions
     if (cmd.options.requiredPermissions) {
-      const hasPermissions = cmd.options.requiredPermissions.every((perm) =>
-        message.member?.permissions.has(perm)
-      ) || message.isFromBotOwner
+      const hasPermissions = cmd.options.requiredPermissions.every((perm) => {
+        return message.member?.permissions.has(perm)
+      }) || message.isFromBotOwner
 
       if (!hasPermissions) {
         return await sendErrorEmbed(message, 'command.error.noPermissions')
@@ -142,7 +142,7 @@ const event: EventListener<'messageCreate'> = {
     if (cmd.options?.allowedRoles) {
       const userRoles = await message.member?.roles.array()
       const hasRoles = cmd.options.allowedRoles.some((role) =>
-        userRoles?.some((r) => r.name === role)
+        userRoles?.some((r) => r.name.toLowerCase() === role.toLocaleLowerCase())
       ) || message.isFromBotOwner
 
       if (!hasRoles) {
@@ -178,7 +178,7 @@ const event: EventListener<'messageCreate'> = {
                 .addField(t(message.locale, 'command.help.aliases'), `\`\`\`${cmd.options.aliases?.join(', ')}\`\`\``, true)
                 .addField(t(message.locale, 'command.help.cooldown'), `\`\`\`${
                   cmd.options.coolDown 
-                    ? cmd.options.coolDown * 1000 + 's' : '--'
+                    ? cmd.options.coolDown / 1000 + 's' : '--'
                 }${
                   cmd.options?.roleCoolDown 
                     ? '\n'+cmd.options.roleCoolDown.map( role => `${role.role}: ${role.coolDown*1000}s`).join('\n') 
