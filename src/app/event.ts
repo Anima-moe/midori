@@ -36,10 +36,8 @@ handler.on('load', async (filePath) => {
 
     logger.success(
       `Listening to ${
-        baseName.includes('.native')
-          ? crayon.green('native')
-          : crayon.bgLightYellow('custom')
-      } event "${crayon.lightCyan(clearName)}" - ${
+        baseName.includes('.native') && crayon.green('native ') || ''
+      }event "${crayon.lightCyan(clearName)}" - ${
         crayon.lightBlack(event.default.description)
       }`,
     )
