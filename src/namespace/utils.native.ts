@@ -36,7 +36,6 @@ export function resolveArgument(
   optionArg: CommandOptions<any>['args'],
 ) {
   const resolvedArgs: { [key: string]: string | number } = {}
-  console.log(args, optionArg)
   optionArg?.forEach((arg) => {
     if (args[arg.flag]) {
       resolvedArgs[arg.name] = args[arg.flag]
@@ -45,9 +44,17 @@ export function resolveArgument(
     } else if (!resolvedArgs[arg.name] && arg.default) {
       resolvedArgs[arg.name] = arg.default
     } else if (!resolvedArgs[arg.name] && arg.required) {
-      throw new Error(`error.command.missingArgument ${arg.name}`)
+      throw new Error('generic.err.command.missingArgument')
+    }
+
+    if (resolvedArgs[arg.name] && arg.validate) {
+      const validation = arg.validate(resolvedArgs[arg.name])
+      if (!validation) {
+        throw new Error('generic.err.command.invalidArgument')
+      }
     }
   })
+
 
   return resolvedArgs
 }
@@ -61,9 +68,7 @@ export function resolvePositionalArgument(
   const resolvedArgs: { [key: string]: string | number } = {}
 
   if (optionArg.length > args.length) {
-    throw new Error(
-      `error.command.missingPositionalArgument ${optionArg![args.length].name}`,
-    )
+    throw new Error('generic.err.command.missingPositionalArgument')
   }
 
   optionArg?.forEach((arg, index) => {
@@ -82,7 +87,7 @@ export async function sendErrorEmbed(
 ) {
   const embed = await new harmony.Embed()
     .setColor('RED')
-    .setDescription(t(message.locale, content || 'command.error.generic', args))
+    .setDescription(t(message.locale, content || 'generic.err.command.unknown', args))
   return await message.channel.send({ embeds: [embed] })
 }
 
@@ -103,9 +108,9 @@ export async function safeSendMessage(
   args?: { [key: string]: string | number }
 ) {
   try {
-    return await message.channel.send(t(message.locale, content || 'command.success.generic', args))
+    return await message.channel.send(t(message.locale, content || 'generic.succ.command', args))
   } catch {
-    await sendErrorEmbed(message, content || 'command.error.generic')
+    await sendErrorEmbed(message, content || 'generic.err.command.unknown')
   }
 }
 
@@ -115,7 +120,7 @@ export async function safeRemoveReactions(
   try {
     await message.reactions.removeAll()
   } catch {
-    return await sendErrorEmbed(message, 'command.error.generic')
+    return await sendErrorEmbed(message, 'generic.err.command.unknown')
   }
 }
 
@@ -126,6 +131,6 @@ export async function safeAddReaction(
   try {
     await message.addReaction(emoji)
   } catch {
-    return await sendErrorEmbed(message, 'command.error.generic')
+    return await sendErrorEmbed(message, 'generic.err.command.unknown')
   }
 }
