@@ -67,15 +67,16 @@ export function resolvePositionalArgument(
 
   const resolvedArgs: { [key: string]: string | number } = {}
 
-  if (optionArg.length > args.length) {
-    throw new Error('generic.err.command.missingPositionalArgument')
-  }
-
   optionArg?.forEach((arg, index) => {
     if (args[index]) {
       resolvedArgs[arg.name] = args[index]
     }
   })
+
+  
+  if (optionArg.filter(a => a.required).length > args.length) {
+    throw new Error('generic.err.command.missingPositionalArgument')
+  }
 
   return resolvedArgs
 }
