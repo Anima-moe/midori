@@ -8,7 +8,8 @@ import {
   isNormalMessage,
   safeAddReaction,
   safeRemoveReactions,
-  safeSendMessage
+  safeSendMessage,
+sendErrorEmbed
 } from '@/namespace/utils.native.ts'
 
 import Keyword from '@/model/keywords.ts'
@@ -28,22 +29,42 @@ const event: EventListener<'messageCreate'> = {
     if (!isNormalMessage(message)) { return }
     if (message.content.startsWith(client.prefix.toString())) { return }
 
-    // TEST FOR KEYWORD MATCH/SIMILARITY
-    // if similarity is above 0.5, send the keyword response
-    if (keywordCache.get('keywordList').length === 0) {
-      const keywordList = orm.findMany(Keyword, {})
-      keywordCache.set('keywordList', keywordList)
-    }
-
-    const keywordList = keywordCache.get('keywordList')
-    for (const keyword of keywordList) {
-      const keywordTest = keyword.keyword.split('<<LOCALE_KEYWORD>>')[1]
-      if (!keywordTest) continue
-      const similarity = stringSimilarity.compareTwoStrings(message.content.toLowerCase(), keywordTest.toLowerCase())
-  
-      if (similarity > 0.5) {
-        safeSendMessage(message, keyword.response)
+    try{
+      // TEST FOR KEYWORD MATCH/SIMILARITY
+      // if similarity is above 0.5, send the keyword response
+      if (keywordCache.get('keywordList')?.length === 0) {
+        const keywordList = orm.findMany(Keyword, {})
+        keywordCache.set('keywordList', keywordList)
       }
+  
+      const keywordList = keywordCache.get('keywordList')
+      let highestSimilarity: string
+      for (const keyword of keywordList || []) {
+        const keywordTest = keyword.keyword.split('<<LOCALE_KEYWORD>>')[1]
+  
+        let threshold = 0.5
+  
+        if (message.content.split(' ').length > 5) {
+          threshold = 0.3
+        }
+  
+        if (message.content.split(' ').length > 10) {
+          threshold = 0.4
+        }
+  
+        if (!keywordTest) continue
+        const similarity = stringSimilarity.compareTwoStrings(message.content.toLowerCase(), keywordTest.toLowerCase())
+  
+        if (similarity > threshold) {
+          highestSimilarity = keyword.response
+        }
+      }
+  
+      if (highestSimilarity!) {
+        safeSendMessage(message, highestSimilarity)
+      }
+    } catch (e) {
+      return logger.error(`${e}`)
     }
   },
 }
