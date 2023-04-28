@@ -8,7 +8,7 @@ export default {
         noPermissions: 'Você não tem permissão para executar este comando.',
         noRoles: 'Você não tem permissão para executar este comando.',
         missingArgument: 'Um ou mais argumentos estão faltando\n\nTente `{command} -h` ou `{command} --help`',
-        missingPositionalArgument: 'Um ou mais argumentos estão faltando **{argument}**\n\nTente `{command} -h` ou `{command} --help',
+        missingPositionalArgument: 'Um ou mais argumentos estão faltando\n\nTente `{command} -h` ou `{command} --help`',
         invalidArgument: 'Argumento inválido\n\nTente `{command} -h` ou `{command} --help`',
       },
     },
@@ -27,6 +27,10 @@ export default {
       cooldown: '⏳ Cooldown',
       usage: '🛡️ Uso',
       name: 'Nome',
+      category: '🏷️ Categoria',
+      command: '📦 Comando',
+      title: 'Ajuda',
+      content: '```ahk\n-f --flag: ;Flag obrigatória\n-f --flag  ;Flag opcional\n\n<argumento>: ;Argumento obrigatório\n[argumento]  ;Argumento opcional\```'
     },
     ping: {
       reply: '🏓 Pong!\n\nPing: **{latency}ms**\nComando processado em: **{processing}ms**',
@@ -40,6 +44,9 @@ export default {
         keyword: 'Frase/palavra-chave a ser adicionada/removida\n;[necessário apenas para as ações "add" e "remove"]',
         response: 'Resposta a ser enviada quando a palavra-chave for acionada\n;[necessário apenas para a ação "add"]',
         locale: 'Idioma da palavra-chave\n;[deifinida como pt-BR se omitida]',
+      },
+      add: {
+        succ: '🔑 **{keyword}** adicionada com sucesso!',
       },
       tips: {
         noArgsOnList: '💡 Dica! Você não precisa dos arguments `-k` nem `-r` para listar.',
@@ -66,6 +73,13 @@ export default {
         action: 'Response to send when the keyword is detected [only required for the "add" action]',
       }
     }
+  },
+  categories: {
+    generic: '📦 Genérico',
+    moderation: '🛡️ Moderação',
+    utility: '⚒️ Utilidade',
+    fun: '🎈 Diversão',
+    anima: '📷 Anima'
   },
   permission: {
     CREATE_INSTANT_INVITE: "Criar convite instantâneo",
