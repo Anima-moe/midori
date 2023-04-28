@@ -9,7 +9,7 @@ import {
 } from '@/app/command.ts'
 import { ensureCache } from '@/app/cache.ts'
 
-import { argParser, dayjs, harmony, t } from '@/deps.ts'
+import { argParser, crayon, dayjs, harmony, t } from '@/deps.ts'
 import {
   isNormalMessage,
   resolveArgument,
@@ -72,30 +72,37 @@ const event: EventListener<'messageCreate'> = {
     const key = message.content.split(/\s+/)[0].slice(prefix.length)
     const cmd: Command<any> | undefined = commands.resolve(key)
 
-    message.isFromBotOwner = message.author.id === Deno.env.get('BOT_OWNER')
-    message.isFromGuildOwner = message?.guild?.ownerID === message.author.id || message.guild?.ownerID === message.author.id
-    message.args = {}
-    message.positionalArgs = {}
-    message.send = async function (
-      this: NormalMessage,
-      sent: string | harmony.AllMessageOptions,
-    ) {
-      return await this.channel.send(sent)
-    }.bind(message)
-    
-    if (cmd?.options.botOwnerOnly && !message.isFromBotOwner) {
-      return await sendErrorEmbed(message, 'generic.err.command.botOwnerOnly')
-    }
-
-    message.locale =
-      (await message?.member?.roles.array())?.find((role) =>
-        role.name.startsWith('lang:')
-      )?.name.replace('lang:', '') || Deno.env.get('BOT_DEFAULT_LOCALE') ||
-      'en-US'
+    // Discord sometimes reports 404 on stuff out of cache, meaning some of those functions might throw an error.
+    // This is a workaround to prevent the bot from crashing.
+    try {
+      message.isFromBotOwner = message.author.id === Deno.env.get('BOT_OWNER')
+      message.isFromGuildOwner = message?.guild?.ownerID === message.author.id || message.guild?.ownerID === message.author.id
+      message.args = {}
+      message.positionalArgs = {}
+      message.send = async function (
+        this: NormalMessage,
+        sent: string | harmony.AllMessageOptions,
+      ) {
+        return await this.channel.send(sent)
+      }.bind(message)
       
-    if (isSelfMention) {
-      console.log('Mentioned midori')
-      return await sendSuccessEmbed(message, 'generic.mention', { prefix })
+      if (cmd?.options.botOwnerOnly && !message.isFromBotOwner) {
+        return await sendErrorEmbed(message, 'generic.err.command.botOwnerOnly')
+      }
+  
+      message.locale =
+        (await message?.member?.roles.array())?.find((role) =>
+          role.name.startsWith('lang:')
+        )?.name.replace('lang:', '') || Deno.env.get('BOT_DEFAULT_LOCALE') ||
+        'en-US'
+        
+      if (isSelfMention) {
+        console.log('Mentioned midori')
+        return await sendSuccessEmbed(message, 'generic.mention', { prefix })
+      }
+    } catch (e) {
+      logger.error(`Error while handling command ${crayon.lightCyan('messageCreate.native')} execution`)
+      console.error(e)
     }
 
     if (!cmd) return
@@ -161,35 +168,46 @@ const event: EventListener<'messageCreate'> = {
         const parsedArgs = argParser(cleanContent)
                 
         if (parsedArgs.help || parsedArgs.h) {
-          return await message.channel.send({
-            embeds: [
-              new harmony.Embed()
-                .setColor('#2b2d31')
-                .addField(t(message.locale, 'command.help.name'), `\`\`\`${cmd.options.name}\`\`\``)
-                .addField(t(message.locale, 'command.help.description'), `\`\`\`${t(message.locale, cmd.options.longDescription || cmd.options.description || '--')}\`\`\``)
-                .addField(t(message.locale, 'command.help.arguments'), `\`\`\`ahk\n${[...cmd.options.args || [], {
-                  flag: 'h',
-                  name: 'help',
-                  description: t(message.locale, 'command.help.defaultArgument'),
-                }]?.map(arg => {
-                    return `\n-${arg.flag} --${arg.name}: ; ${t(message.locale, arg.description || '')}`
-                  })
-                  .join('') || '--'}\`\`\``)
-                .addField(t(message.locale, 'command.help.aliases'), `\`\`\`${cmd.options.aliases?.join(', ')}\`\`\``, true)
-                .addField(t(message.locale, 'command.help.cooldown'), `\`\`\`${
-                  cmd.options.coolDown 
-                    ? cmd.options.coolDown / 1000 + 's' : '--'
-                }${
-                  cmd.options?.roleCoolDown 
-                    ? '\n'+cmd.options.roleCoolDown.map( role => `${role.role}: ${role.coolDown*1000}s`).join('\n') 
-                    : ''
-                }\`\`\``, true)
-                .addField(t(message.locale, 'command.help.usage'), `\`\`\`${prefix}${cmd.options.name} ${t(message.locale, cmd.options.usage || '')}\`\`\``)
-                .addField(t(message.locale, 'command.help.permissions'), `\`\`\`${cmd.options.botOwnerOnly ? 'Developer' : cmd.options.requiredPermissions?.map(perm => t(message.locale, `permission.${perm}`)).join(', ') || '--'}\`\`\``, true)
-            ],
-          })
-        }
+          const helpEmbed = new harmony.Embed()
+            .setColor('#2b2d31')
+            .addField(t(message.locale, 'command.help.name'), `\`\`\`${cmd.options.name}\`\`\``)
+            .addField(t(message.locale, 'command.help.description'), `\`\`\`${t(message.locale, cmd.options.longDescription || cmd.options.description || '--')}\`\`\``)
+            
+            .addField(
+              t(message.locale, 'command.help.arguments'), 
+              `\`\`\`ahk\n${[...cmd.options.args || [], { flag: 'h', name: 'help', description: t(message.locale, 'command.help.defaultArgument'),}]
+                ?.map(arg => {
+                  return `\n-${arg.flag} --${arg.name}${arg.required ? ':' : ''} \n;${t(message.locale, arg.description || '')}`
+                })
+                .join('\n') || '--'}\`\`\``
+            )
+            if (cmd.options.positionalArgs && cmd.options.positionalArgs?.length > 0) {
+              helpEmbed
+              .addField(
+                t(message.locale, 'command.help.positionalArguments'),
+                '\`\`\`ahk\n' + cmd.options.positionalArgs?.map(arg => {
+                  return `\n${arg.required ? `<${arg.name}>:` : `[${arg.name}]` + ` ;${arg.description}`}`
+                }) + '\`\`\`'
+                )
+            }
 
+            helpEmbed
+            .addField(t(message.locale, 'command.help.aliases'), `\`\`\`${cmd.options.aliases?.join(', ')}\`\`\``, true)
+            .addField(t(message.locale, 'command.help.cooldown'), `\`\`\`${
+              cmd.options.coolDown 
+                ? cmd.options.coolDown / 1000 + 's' : '--'
+            }${
+              cmd.options?.roleCoolDown 
+                ? '\n'+cmd.options.roleCoolDown.map( role => `${role.role}: ${role.coolDown*1000}s`).join('\n') 
+                : ''
+            }\`\`\``, true)
+            .addField(t(message.locale, 'command.help.usage'), `\`\`\`${prefix}${cmd.options.name} ${t(message.locale, cmd.options.usage || '')}\`\`\``)
+            .addField(t(message.locale, 'command.help.permissions'), `\`\`\`${cmd.options.botOwnerOnly ? 'Developer' : cmd.options.requiredPermissions?.map(perm => t(message.locale, `permission.${perm}`)).join(', ') || '--'}\`\`\``, true)
+
+
+            return message.send({ embeds: [helpEmbed] })
+          }
+  
         const positionalObject = resolvePositionalArgument(
           parsedArgs._,
           cmd.options.positionalArgs,
