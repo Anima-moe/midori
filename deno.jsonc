@@ -9,11 +9,9 @@
     "watch": "deno run --watch --allow-run --allow-ffi --allow-env --allow-net --allow-read --allow-write --unstable --import-map=deno.jsonc src/main.ts"
   },
   "fmt": {
-    "options": {
-      "semiColons": false,
-      "singleQuote": true,
-      "indentWidth": 2
-    }
+    "semiColons": false,
+    "singleQuote": true,
+    "indentWidth": 2
   },
   "lint": {
     "rules": {
