@@ -2,8 +2,8 @@ import Logger from '@/app/core/logger.ts'
 import { Handler } from '@/app/core/handler.ts'
 import { crayon, harmony } from '@/deps.ts'
 import { resolve } from 'https://deno.land/std@0.176.0/path/win32.ts'
-import { Translations } from "https://deno.land/x/t_i18n@2.1.0/mod.ts"
-import ptBR from "../language/pt-BR.ts";
+import { Translations } from 'https://deno.land/x/t_i18n@2.1.0/mod.ts'
+import ptBR from '../language/pt-BR.ts'
 
 // https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags
 export const PermissionFlags = {
@@ -62,7 +62,7 @@ export type SentItem = string | harmony.MessagePayload | harmony.MessageOptions
 export type NormalMessage = harmony.Message & {
   customData: any
   args: { [name: string]: string | number }
-  positionalArgs: {[key: string]: string | number}
+  positionalArgs: { [key: string]: string | number }
   triggerCoolDown: () => void
   send: (
     this: NormalMessage,
@@ -103,16 +103,14 @@ export interface CommandOptions<T extends keyof CommandMessageType> {
   name: string
   /**
    * Brief description of what the command does
-   * 
+   *
    * * You can use dot notation to automatically translate this to the user's locale
-   * 
    */
   description: Translations<typeof ptBR>
   /**
    * Longer description shown when the command is used with the help flag
    *
    * * You can use dot notation to automatically translate this to the user's locale
-   * 
    */
   longDescription?: Translations<typeof ptBR>
   /**
@@ -121,11 +119,11 @@ export interface CommandOptions<T extends keyof CommandMessageType> {
   aliases?: string[]
   /**
    * Command category, defaults to generic
-   * 
+   *
    * * You can use dot notation to automatically translate this to the user's locale
-   * 
+   *
    * @default "generic"
-  */
+   */
   category?: string
   /**
    * Command arguments
@@ -202,7 +200,7 @@ export interface CommandOptions<T extends keyof CommandMessageType> {
     | harmony.PermissionResolvable[]
   /**
    * List of roles allowed to execute this command (does not override requiredPermissions)
-  */
+   */
   allowedRoles?: string[]
   /**
    * Function that will be executed when the command is triggered
@@ -235,7 +233,7 @@ export interface CommandOptions<T extends keyof CommandMessageType> {
   /**
    * Runs before the `execute` function
    * * You can set `message.customData` and retrieve it on `execute`, `onError` and `afterExecute`
-  */
+   */
   beforeExecute?: (
     this: CommandMessageType[T],
     message: CommandMessageType[T],
@@ -333,11 +331,10 @@ export function validateCommand<
   // CoolDown is set, but never called.
   if (
     (
-      command.options?.coolDown || 
-      command.options.roleCoolDown || 
+      command.options?.coolDown ||
+      command.options.roleCoolDown ||
       command.options.globalCoolDown
-    ) 
-    && 
+    ) &&
     (
       !command.options.execute.toString().includes('triggerCoolDown()') &&
       !command.options.afterExecute?.toString().includes('triggerCoolDown()')

@@ -55,7 +55,7 @@ const handler = new Handler('src/job')
 handler.on('load', async (filePath) => {
   const job = await import('file://' + resolve(filePath))
   const jobBreadcrumb = filePath.split('\\').slice(2).join(' > ')
-  
+
   if (!job.default) {
     logger.error(
       `The cronjob file ${jobBreadcrumb} needs to export Cron instance as default`,

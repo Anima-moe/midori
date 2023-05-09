@@ -55,7 +55,6 @@ export function resolveArgument(
     }
   })
 
-
   return resolvedArgs
 }
 
@@ -73,8 +72,7 @@ export function resolvePositionalArgument(
     }
   })
 
-  
-  if (optionArg.filter(a => a.required).length > args.length) {
+  if (optionArg.filter((a) => a.required).length > args.length) {
     throw new Error('generic.err.command.missingPositionalArgument')
   }
 
@@ -84,39 +82,45 @@ export function resolvePositionalArgument(
 export async function sendErrorEmbed(
   message: NormalMessage,
   content?: string,
-  args?: { [key: string]: string | number }
+  args?: { [key: string]: string | number },
 ) {
   const embed = await new harmony.Embed()
     .setColor('RED')
-    .setDescription(t(message.locale, content || 'generic.err.command.unknown', args))
+    .setDescription(
+      t(message.locale, content || 'generic.err.command.unknown', args),
+    )
   return await message.channel.send({ embeds: [embed] })
 }
 
 export async function sendSuccessEmbed(
   message: NormalMessage,
   content?: string,
-  args?: { [key: string]: string | number }
+  args?: { [key: string]: string | number },
 ) {
   const embed = await new harmony.Embed()
     .setColor('GREEN')
-    .setDescription(t(message.locale, content || 'command.success.generic', args))
+    .setDescription(
+      t(message.locale, content || 'command.success.generic', args),
+    )
   return await message.channel.send({ embeds: [embed] })
 }
 
 export async function safeSendMessage(
   message: NormalMessage,
   content: string,
-  args?: { [key: string]: string | number }
+  args?: { [key: string]: string | number },
 ) {
   try {
-    return await message.channel.send(t(message.locale, content || 'generic.succ.command', args))
+    return await message.channel.send(
+      t(message.locale, content || 'generic.succ.command', args),
+    )
   } catch {
     await sendErrorEmbed(message, content || 'generic.err.command.unknown')
   }
 }
 
 export async function safeRemoveReactions(
-  message: NormalMessage
+  message: NormalMessage,
 ) {
   try {
     await message.reactions.removeAll()
@@ -127,7 +131,7 @@ export async function safeRemoveReactions(
 
 export async function safeAddReaction(
   message: NormalMessage,
-  emoji: string
+  emoji: string,
 ) {
   try {
     await message.addReaction(emoji)

@@ -1,5 +1,11 @@
 import { harmony } from '@/deps.ts'
 
+export const INTERNAL_STATE: Map<string, unknown> = new Map()
+export const add_to_state = (key: string) => (value: unknown) =>
+  INTERNAL_STATE.set(key, value)
+export const get_from_state = <T>(key: string) =>
+  INTERNAL_STATE.get(key) as T | undefined
+
 // Start bot.
 export const client = new harmony.CommandClient({
   prefix: Deno.env.get('BOT_PREFIX') || '!',
