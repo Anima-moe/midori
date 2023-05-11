@@ -2,7 +2,7 @@ import { Cache } from '@/deps.ts'
 
 const cacheCollection = new Map<string, Cache<string, any>>()
 
-export function ensureCache<T>(key: string, ttl: number) {
+export function ensure<T>(key: string, ttl: number) {
   if (!cacheCollection.has(key)) {
     cacheCollection.set(
       key,

@@ -1,8 +1,8 @@
-import { Command } from "@/app/command.ts";
-import { harmony } from "@/deps.ts";
-import { sendErrorEmbed } from "../../namespace/utils.native.ts";
+import { CustomCommand } from "@/app/command.ts";
+import * as app from '@/app.ts'
+import { sendErrorEmbed } from "@/namespace/utils.native.ts";
 
-export default new Command({
+export default new CustomCommand({
   name: 'translateerror',
   description: 'command.translateerror.description',
   aliases: ['te', 'decode', 'geterr'],
@@ -41,7 +41,7 @@ export default new Command({
       return
     }
 
-    const embed = new harmony.Embed()
+    const embed = new app.Embed()
     .setColor('#2b2d31')
 
     const decoded = atob(referenceMessage)

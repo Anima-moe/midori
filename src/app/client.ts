@@ -1,10 +1,10 @@
 import { harmony } from '@/deps.ts'
 
-export const INTERNAL_STATE: Map<string, unknown> = new Map()
-export const addToClientState = (key: string) => (value: unknown) =>
-  INTERNAL_STATE.set(key, value)
-export const getFromClientState = <T>(key: string) =>
-  INTERNAL_STATE.get(key) as T | undefined
+export const _internalState: Map<string, unknown> = new Map()
+export const addToState = (key: string) => (value: unknown) =>
+  _internalState.set(key, value)
+export const getFromState = <T>(key: string) =>
+  _internalState.get(key) as T | undefined
 
 // Start bot.
 export const client = new harmony.CommandClient({

@@ -1,13 +1,9 @@
-import { Command } from '@/app/command.ts'
-import { models } from '@/app/database.ts'
-import { harmony, orm, t } from '../../deps.ts'
+import * as app from '@/app.ts'
+import { orm, t } from '@/deps.ts'
 import Keyword from '@/model/keywords.ts'
-import {
-  sendErrorEmbed,
-  sendSuccessEmbed,
-} from '../../namespace/utils.native.ts'
+import { sendErrorEmbed, sendSuccessEmbed } from '@/namespace/utils.native.ts'
 
-const KeywordManager = new Command({
+const KeywordManager = new app.command.CustomCommand({
   name: 'keywordmanager',
   description: 'command.keyword.description',
   longDescription: 'command.keyword.longDescription',
@@ -64,7 +60,7 @@ const KeywordManager = new Command({
       message.args.action === 'list' &&
       (message.args.keyword || message.args.response)
     ) {
-      const embed = new harmony.Embed()
+      const embed = new app.Embed()
         .setColor('#f5b342')
         .setDescription('\u200b')
         .setDescription(
@@ -74,13 +70,13 @@ const KeywordManager = new Command({
     }
 
     if (message.args.action === 'remove' && message.args.response) {
-      const embed = new harmony.Embed()
+      const embed = new app.Embed()
         .setColor('#f5b342')
         .setDescription(t(message.locale, 'command.keyword.tips.noArgsOnList'))
       message.customData.tips.push(embed)
     }
 
-    const tableResolvable = models.get('keyword')
+    const tableResolvable = app.database.models.get('keyword')
     if (!tableResolvable) throw new Error('Table not found')
 
     const availableKeywords = await orm.findMany(tableResolvable, {})
@@ -105,7 +101,7 @@ const KeywordManager = new Command({
           return
         }
 
-        const tableResolvable = models.get('keyword')
+        const tableResolvable = app.database.models.get('keyword')
         if (!tableResolvable) throw new Error('Table not found')
 
         const keywordModel = new Keyword()
@@ -122,7 +118,7 @@ const KeywordManager = new Command({
         break
       }
       case 'remove': {
-        const tableResolvable = models.get('keyword')
+        const tableResolvable = app.database.models.get('keyword')
         if (!tableResolvable) throw new Error('Table not found')
         const arg = message.args.keyword as string
 
@@ -143,7 +139,7 @@ const KeywordManager = new Command({
           registeredKeywords: Keyword[]
         }
 
-        const embed = new harmony.Embed()
+        const embed = new app.Embed()
           .setColor(Deno.env.get('EMBED_COLOR') || '#57FF9A')
           .setTitle(t(message.locale, 'command.keyword.list.title'))
 

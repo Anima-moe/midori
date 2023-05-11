@@ -1,5 +1,5 @@
 import { crayon } from '@/deps.ts'
-import { getClient } from '../app/client.ts'
+import * as app from '@/app.ts'
 
 export default {
   description: 'Says hi',
@@ -14,13 +14,12 @@ export default {
 888   "   888 888 Y88b 888 Y88..88P 888     888 
 888       888 888  "Y88888  "Y88P"  888     888 
     `)))
-    const client = getClient()
+    const client = app.getClient()
 
     console.log(
       `${
         crayon.cyan(
-          'My prefix is configured to ' +
-            crayon.yellow(crayon.bold(client.prefix.toString())),
+          `My prefix is configured to " ${crayon.yellow(crayon.bold(client.prefix.toString()))}"`,
         )
       }`,
     )

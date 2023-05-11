@@ -1,19 +1,19 @@
-import { dayjs, harmony } from "@/deps.ts"
-import { ensureCache } from '@/app/cache.ts'
+import { dayjs } from "@/deps.ts"
+import * as app from "@/app.ts"
 
-export type interactionHandler = (interaction: harmony.Interaction) => Promise<void>
+export type interactionHandler = (interaction: app.Interaction) => Promise<void>
 
-export const interactionHandlers = ensureCache<interactionHandler>('interactionHandler', 1000 * 60 * 60 * 24)
+export const interactionHandlers = app.cache.ensure<interactionHandler>('interactionHandler', 1000 * 60 * 60 * 24)
 
-export const coolDownCache = ensureCache<dayjs.Dayjs>('cooldown', Number(Deno.env.get('MAX_COOLDOWN') || 1000 * 60 * 30))
+export const coolDownCache = app.cache.ensure<dayjs.Dayjs>('cooldown', Number(Deno.env.get('MAX_COOLDOWN') || 1000 * 60 * 30))
 
-export const globalCoolDownCache = ensureCache<dayjs.Dayjs>('globalCooldown', Number(Deno.env.get('MAX_COOLDOWN') || 1000 * 60 * 30))
+export const globalCoolDownCache = app.cache.ensure<dayjs.Dayjs>('globalCooldown', Number(Deno.env.get('MAX_COOLDOWN') || 1000 * 60 * 30))
 
 export const paginateEmbed =
   (by: 'next' | 'previous') =>
   (curr: number) =>
-  (message: harmony.Message) =>
-  async (embeds: harmony.Embed[]): Promise<number> => {
+  (message: app.Message) =>
+  async (embeds: app.Embed[]): Promise<number> => {
     if (message.embeds.length === 0) {
       await message.edit({ embeds: [embeds[0]] })
       return 0
@@ -21,7 +21,7 @@ export const paginateEmbed =
 
     const indicator = by === 'next' ? 1 : -1
     const getNextEmbed =
-      (arr: harmony.Embed[]) => (val: harmony.Embed): harmony.Embed => {
+      (arr: app.Embed[]) => (val: app.Embed): app.Embed => {
         for (let index = 0; index < arr.length; index++) {
           if (arr[index] === val) {
             return by === 'next'

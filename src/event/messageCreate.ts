@@ -1,7 +1,5 @@
 import Logger from '@/app/core/logger.ts'
-import { client } from '@/app/client.ts'
-import { EventListener } from '@/app/event.ts'
-import { ensureCache } from '@/app/cache.ts'
+import * as app from '@/app.ts'
 
 import { orm, stringSimilarity } from '@/deps.ts'
 import {
@@ -16,15 +14,15 @@ const logger = new Logger({
   prefix: 'MsgHandler',
 })
 
-const keywordCache = ensureCache<Keyword[]>('keyword', 1000 * 60 * 10) // keyword cache clears every 10 minutes.
+const keywordCache = app.cache.ensure<Keyword[]>('keyword', 1000 * 60 * 10) // keyword cache clears every 10 minutes.
 keywordCache.set('keywordList', [])
 
-const event: EventListener<'messageCreate'> = {
+const event: app.event.Listener<'messageCreate'> = {
   description: 'Handles messages and executes automatic actions',
   once: false,
   execute: (message) => {
     if (!isNormalMessage(message)) return
-    if (message.content.startsWith(client.prefix.toString())) return
+    if (message.content.startsWith(app.client.prefix.toString())) return
 
     try {
       // TEST FOR KEYWORD MATCH/SIMILARITY

@@ -17,7 +17,7 @@ const logger = new Logger({
     | 'success' || 'debug',
 })
 
-const handler = new Handler('src/event')
+export const handler = new Handler('src/event')
 
 handler.on('load', async (filePath) => {
   const event = await import('file://' + resolve(filePath)) as {
@@ -68,7 +68,7 @@ export function validateEvent(event: EventMaker) {
   if (!event.description) throw new Error('Event must have a description')
   if (!event.execute) throw new Error('Event must have an execute function')
 }
-export type EventListener<EventName extends keyof harmony.ClientEvents> = {
+export type Listener<EventName extends keyof harmony.ClientEvents> = {
   description: string
   once?: boolean
   execute: (
@@ -82,5 +82,3 @@ export type EventListener<EventName extends keyof harmony.ClientEvents> = {
         : void)
   ) => void
 }
-
-export default handler

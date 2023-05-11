@@ -1,10 +1,10 @@
-import { harmony, t } from '@/deps.ts'
-import { CommandOptions, NormalMessage } from '../app/command.ts'
+import {  t } from '@/deps.ts'
 import { interactionHandler, interactionHandlers, paginateEmbed } from "./states.native.ts"
-import { addToClientState, getFromClientState } from "../app/client.ts"
+import * as app from '@/app.ts'
+import { NormalMessage } from "../../@types/event.d.ts";
 
 export function isNormalMessage(
-  message: harmony.Message,
+  message: app.Message,
 ) {
   return (
     !!message.channel &&
@@ -15,26 +15,26 @@ export function isNormalMessage(
 }
 
 export function isGuildMessage(
-  message: harmony.Message,
+  message: app.Message,
 ) {
   return (
     !!message.member &&
     !!message.guild &&
-    message.channel instanceof harmony.GuildChannel
+    message.channel instanceof app.GuildChannel
   )
 }
 
 export function isPrivateMessage(
-  message: harmony.Message,
+  message: app.Message,
 ) {
   return (
-    message.channel instanceof harmony.DMChannel
+    message.channel instanceof app.DMChannel
   )
 }
 
 export function resolveArgument(
   args: { [key: string]: string | number },
-  optionArg: CommandOptions<any>['args'],
+  optionArg: app.command.Options<any>['args'],
 ) {
   const resolvedArgs: { [key: string]: string | number } = {}
   optionArg?.forEach((arg) => {
@@ -61,7 +61,7 @@ export function resolveArgument(
 
 export function resolvePositionalArgument(
   args: (string | number)[],
-  optionArg: CommandOptions<any>['positionalArgs'],
+  optionArg: app.command.Options<any>['positionalArgs'],
 ) {
   if (!optionArg) return {}
 
@@ -85,7 +85,7 @@ export async function sendErrorEmbed(
   content?: string,
   args?: { [key: string]: string | number },
 ) {
-  const embed = await new harmony.Embed()
+  const embed = await new app.Embed()
     .setColor('RED')
     .setDescription(
       t(message.locale, content || 'generic.err.command.unknown', args),
@@ -98,7 +98,7 @@ export async function sendSuccessEmbed(
   content?: string,
   args?: { [key: string]: string | number },
 ) {
-  const embed = await new harmony.Embed()
+  const embed = await new app.Embed()
     .setColor('GREEN')
     .setDescription(
       t(message.locale, content || 'command.success.generic', args),
@@ -148,14 +148,14 @@ export function generatePaginationButton(id: string, action: 'previous' | 'next'
       return 
     }
 
-    const embeds = getFromClientState<harmony.Embed[]>(`paginatedEmbed@${id}`)!
-    const current = getFromClientState<number>(`firstPaginatedEmbed@${id}`)!
+    const embeds = app.getFromState<app.Embed[]>(`paginatedEmbed@${id}`)!
+    const current = app.getFromState<number>(`firstPaginatedEmbed@${id}`)!
 
     await interaction.respond({
       type: 'UPDATE_MESSAGE',
     })
 
-    addToClientState(`firstPaginatedEmbed@${id}`)(
+    app.addToState(`firstPaginatedEmbed@${id}`)(
       await paginateEmbed(action)(current)(interaction.message)(embeds),
     )
     return
@@ -164,7 +164,7 @@ export function generatePaginationButton(id: string, action: 'previous' | 'next'
 
 export async function sendPaginatedEmbed(
   message: NormalMessage,
-  embeds: harmony.Embed[],
+  embeds: app.Embed[],
   options?: {
     content?: string,
     buttonStyle?: 'PRIMARY' | 'SECONDARY' | 'SUCCESS' | 'DANGER',
@@ -172,8 +172,8 @@ export async function sendPaginatedEmbed(
     nextButtonLabel?: string
   }
 ) {
-  addToClientState(`paginatedEmbed@${message.id}`)(embeds)
-  addToClientState(`firstPaginatedEmbed@${message.id}`)(0)
+  app.addToState(`paginatedEmbed@${message.id}`)(embeds)
+  app.addToState(`firstPaginatedEmbed@${message.id}`)(0)
 
   interactionHandlers.add(`paginatePrev@${message.id}`, generatePaginationButton(message.id, 'previous'), Number(Deno.env.get('MAX_INTERACTION_TIME') || 60) * 1000)
 

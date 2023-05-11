@@ -1,21 +1,13 @@
 import 'https://deno.land/x/dotenv@v3.2.2/load.ts'
-
-import commandHandler from '@/app/command.ts'
-import cronjobHandler from '@/app/cronjob.ts'
-import eventHandler from '@/app/event.ts'
-import databaseHandler from '@/app/database.ts'
-
-import { client } from '@/app/client.ts'
-
-import { harmony } from '@/deps.ts'
+import * as app from '@/app.ts'
 
 // Load modules.
-await databaseHandler.init()
-await commandHandler.init()
-await cronjobHandler.init()
-await eventHandler.init()
+await app.database.handler.init()
+await app.command.handler.init()
+await app.cronjob.handler.init()
+await app.event.handler.init()
 
-await client.connect(
+await app.client.connect(
   Deno.env.get('BOT_TOKEN'),
-  harmony.Intents.All,
+  app.Intents.All,
 )

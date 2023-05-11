@@ -1,15 +1,8 @@
 import Logger from '@/app/core/logger.ts'
-import { client } from '@/app/client.ts'
-import { EventListener } from '@/app/event.ts'
-import {
-  Command,
-  CommandOptions,
-  commands,
-  NormalMessage,
-} from '@/app/command.ts'
 
+import * as app from '@/app.ts'
 
-import { argParser, crayon, dayjs, harmony, t } from '@/deps.ts'
+import { argParser, crayon, dayjs, t } from '@/deps.ts'
 import {
   isNormalMessage,
   resolveArgument,
@@ -19,7 +12,8 @@ import {
   sendErrorEmbed,
   sendSuccessEmbed,
 } from '@/namespace/utils.native.ts'
-import { coolDownCache, globalCoolDownCache } from "@/namespace/states.native.ts";
+import { coolDownCache, globalCoolDownCache } from "@/namespace/states.native.ts"
+import { NormalMessage } from "../../@types/event.d.ts";
 
 const logger = new Logger({
   logLevel: Deno.env.get('LOG_LEVEL') as any || 'debug',
@@ -29,7 +23,7 @@ const logger = new Logger({
 
 function resolveRoleCoolDown(
   roles?: string[],
-  options?: CommandOptions<'all'>,
+  options?: app.command.Options<'all'>,
 ) {
   if (!roles) return options?.globalCoolDown || options?.coolDown || 0
   if (!options?.roleCoolDown) {
@@ -50,7 +44,7 @@ function resolveRoleCoolDown(
   return smallestCoolDown
 }
 
-const event: EventListener<'messageCreate'> = {
+const event: app.event.Listener<'messageCreate'> = {
   description: 'Manage message commands',
   once: false,
   execute: async (message) => {
@@ -59,12 +53,12 @@ const event: EventListener<'messageCreate'> = {
     const isSelfMention = new RegExp(`<@!?${message.client?.user?.id}>$`).test(
       message.content,
     )
-    const prefix = client.prefix.toString()
+    const prefix = app.client.prefix.toString()
 
     if (!message.content.startsWith(prefix) && !isSelfMention) return
 
     const key = message.content.split(/\s+/)[0].slice(prefix.length)
-    const cmd: Command<any> | undefined = commands.resolve(key)
+    const cmd: app.command.CustomCommand<any> | undefined = app.command.collection.resolve(key)
 
     if (!cmd) return
 
@@ -78,7 +72,7 @@ const event: EventListener<'messageCreate'> = {
     try {
       message.send = async function (
         this: NormalMessage,
-        sent: string | harmony.AllMessageOptions,
+        sent: string | app.AllMessageOptions,
       ) {
         return await this.channel.send(sent)
       }.bind(message)
@@ -194,7 +188,7 @@ const event: EventListener<'messageCreate'> = {
       const parsedArgs = argParser(cleanContent)
 
       if (parsedArgs.help || parsedArgs.h) {
-        const helpEmbed = new harmony.Embed()
+        const helpEmbed = new app.Embed()
           .setColor('#2b2d31')
           .addField(
             t(message.locale, 'command.help.name'),

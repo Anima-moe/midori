@@ -1,9 +1,10 @@
-import type { EventListener } from '@/app/event.ts'
+import type { Listener } from '@/app/event.ts'
 import { interactionHandlers } from "../namespace/states.native.ts"
-import { harmony, t } from '../deps.ts';
-import { client } from "../app/client.ts";
+import { t } from '@/deps.ts';
+import { client } from "@/app/client.ts"
+import * as app from '@/app.ts'
 
-const event: EventListener<'interactionCreate'> = {
+const event: Listener<'interactionCreate'> = {
   description: 'Listens for interactions with native components (like pagination)',
   execute: async (interaction) => {
     const message = interaction.message
@@ -11,7 +12,7 @@ const event: EventListener<'interactionCreate'> = {
     if (!message) { return }
 
     try {
-      const guildChannel = message?.channel as harmony.GuildTextChannel
+      const guildChannel = message?.channel as app.GuildTextChannel
       const guildID = guildChannel?.guildID
       const guild = await client.guilds.get(guildID)
       const guildMember = await guild?.members.get(interaction.user.id)

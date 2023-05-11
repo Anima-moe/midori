@@ -1,6 +1,6 @@
-import { CustomCronjob } from '@/app/cronjob.ts'
+import * as app from '@/app.ts'
 
-const cron: CustomCronjob = {
+const cron: app.cronjob.CustomCronjob = {
   name: 'Example',
   description: 'Example cronjob',
   cron: '*/5 * * * * *',

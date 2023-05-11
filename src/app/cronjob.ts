@@ -50,7 +50,7 @@ export interface CustomCronjob {
   manual?: boolean
 }
 
-const handler = new Handler('src/job')
+export const handler = new Handler('src/job')
 
 handler.on('load', async (filePath) => {
   const job = await import('file://' + resolve(filePath))
@@ -121,5 +121,3 @@ export const jobs =
       })
     }
   })()
-
-export default handler

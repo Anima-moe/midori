@@ -1,14 +1,15 @@
-import { Command } from '@/app/command.ts'
-import { dayjs, harmony, t } from '@/deps.ts'
+import { CustomCommand } from '@/app/command.ts'
+import { dayjs, t } from '@/deps.ts'
+import * as app from '@/app.ts'
 
-const Ping = new Command({
+const Ping = new CustomCommand({
   name: 'ping',
   description: 'command.ping.description',
   aliases: ['latency'],
   coolDown: 1000 * 4,
   category: 'categories.native',
   execute: async (message) => {
-    const embed = new harmony.Embed()
+    const embed = new app.Embed()
       .setColor(Deno.env.get('EMBED_COLOR') || '#57FF9A')
       .setDescription(
         t(message.locale, 'command.ping.reply', {

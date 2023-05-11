@@ -1,4 +1,4 @@
-import { crayon, harmony, orm, SqlTable } from '@/deps.ts'
+import { crayon, harmony, SqlTable } from '@/deps.ts'
 import { Handler } from './core/handler.ts'
 import Logger from './core/logger.ts'
 import { resolve } from 'std/path'
@@ -8,7 +8,7 @@ const logger = new Logger({
   prefix: 'DB',
 })
 
-const handler = new Handler('src/model')
+export const handler = new Handler('src/model')
 
 handler.on('load', async (filePath) => {
   const table = await import('file://' + resolve(filePath)) as {
@@ -49,4 +49,3 @@ export const models =
     }
   })()
 
-export default handler

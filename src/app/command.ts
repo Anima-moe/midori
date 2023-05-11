@@ -4,6 +4,7 @@ import { crayon, harmony } from '@/deps.ts'
 import { resolve } from 'https://deno.land/std@0.176.0/path/win32.ts'
 import { Translations } from 'https://deno.land/x/t_i18n@2.1.0/mod.ts'
 import ptBR from '../language/pt-BR.ts'
+import { NormalMessage } from "../../@types/event.d.ts";
 
 // https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags
 export const PermissionFlags = {
@@ -59,27 +60,6 @@ export const PermissionFlags = {
 
 export type SentItem = string | harmony.MessagePayload | harmony.MessageOptions
 
-export type NormalMessage = harmony.Message & {
-  customData: any
-  args: { [name: string]: string | number }
-  positionalArgs: { [key: string]: string | number }
-  triggerCoolDown: () => void
-  send: (
-    this: NormalMessage,
-    sent: string | harmony.AllMessageOptions,
-  ) => Promise<harmony.Message>
-  isFromBotOwner: boolean
-  isFromGuildOwner: boolean
-  client: harmony.Client
-  /**
-   * Locale key for translation
-   *
-   * This value is set based on the author roles prefixed by `lang:` ex: American English role would be `lang:en-US`
-   * @default .env BOT_LOCALE
-   */
-  locale: string
-}
-
 export type GuildMessage = NormalMessage & {
   channel: harmony.TextChannel & harmony.GuildChannel
   guild: harmony.Guild
@@ -96,7 +76,7 @@ export interface CommandMessageType {
   all: NormalMessage
 }
 
-export interface CommandOptions<T extends keyof CommandMessageType> {
+export interface Options<T extends keyof CommandMessageType> {
   /**
    * Command name & trigger
    */
@@ -265,10 +245,10 @@ export interface CommandOptions<T extends keyof CommandMessageType> {
   ) => Promise<void> | void
 }
 
-export class Command<T extends keyof CommandMessageType = 'all'> {
+export class CustomCommand<T extends keyof CommandMessageType = 'all'> {
   filepath?: string
 
-  constructor(public options: CommandOptions<T>) {}
+  constructor(public options: Options<T>) {}
 }
 
 const logger = new Logger({
@@ -281,7 +261,7 @@ const logger = new Logger({
     | 'success' || 'debug',
 })
 
-const handler = new Handler('src/command')
+export const handler = new Handler('src/command')
 
 handler.on('load', async (filePath) => {
   const command = await import('file://' + resolve(filePath))
@@ -299,7 +279,7 @@ handler.on('load', async (filePath) => {
         crayon.lightBlack(command.default.options.description)
       }`,
     )
-    commands.add(command.default)
+    collection.add(command.default)
   } catch (e) {
     logger.error(`Error while loading command ${commandBreadcrumb}`)
     console.error(e)
@@ -310,7 +290,7 @@ handler.on('load', async (filePath) => {
 export function validateCommand<
   T extends keyof CommandMessageType = keyof CommandMessageType,
 >(
-  command: Command<T>,
+  command: CustomCommand<T>,
 ) {
   // Missing fields
   if (!command.options.name) throw new Error('Command name is required')
@@ -372,22 +352,20 @@ export function validateCommand<
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>
 
-export const commands = new (class CommandCollection extends harmony.Collection<
+export const collection = new (class CommandCollection extends harmony.Collection<
   string,
-  CommandOptions<keyof CommandMessageType>
+  Options<keyof CommandMessageType>
 > {
-  public resolve(key: string): Command<keyof CommandMessageType> | undefined {
+  public resolve(key: string): CustomCommand<keyof CommandMessageType> | undefined {
     for (const [name, commandOptions] of this) {
       if (key === name || commandOptions.aliases?.includes(key)) {
-        return new Command(commandOptions)
+        return new CustomCommand(commandOptions)
       }
     }
   }
 
-  public add(command: Command<keyof CommandMessageType>) {
+  public add(command: CustomCommand<keyof CommandMessageType>) {
     validateCommand(command)
     this.set(command.options.name, command.options)
   }
 })()
-
-export default handler
