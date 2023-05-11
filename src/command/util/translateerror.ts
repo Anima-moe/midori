@@ -7,10 +7,14 @@ export default new CustomCommand({
   description: 'command.translateerror.description',
   aliases: ['te', 'decode', 'geterr'],
   allowedRoles: ['staff', 'mod', 'helping hand', 'code contributor'],
+  category: 'category.utility',
   beforeExecute: async (message) => {
     const referenceMessageID = message?.messageReference?.message_id
     if (!referenceMessageID) {
-      await message.reply('command.translateerror.error.noMessageReference')
+      await await sendErrorEmbed(
+        message,
+        'command.translateerror.err.noMessageReference',
+      )
       return
     }
 
@@ -21,7 +25,7 @@ export default new CustomCommand({
     if (!referenceMessage) {
       await sendErrorEmbed(
         message,
-        'command.translateerror.error.noMessageReference',
+        'command.translateerror.err.noMessageReference',
       )
       return
     }
@@ -31,7 +35,7 @@ export default new CustomCommand({
     if (!referenceMessageContent.startsWith('.err')) {
       await sendErrorEmbed(
         message,
-        'command.translateerror.error.referenceMessageNotError',
+        'command.translateerror.err.referenceMessageNotError',
       )
       return
     }

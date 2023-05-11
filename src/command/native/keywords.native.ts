@@ -9,7 +9,7 @@ const KeywordManager = new app.command.CustomCommand({
   longDescription: 'command.keyword.longDescription',
   usage: '-a add -k "hello world" -r "Hello to you too!"',
   aliases: ['keyword', 'keywords', 'kw', 'kwm'],
-  category: 'categories.native',
+  category: 'category.native',
   args: [
     {
       name: 'action',

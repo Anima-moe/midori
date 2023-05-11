@@ -7,7 +7,7 @@ const Ping = new CustomCommand({
   description: 'command.ping.description',
   aliases: ['latency'],
   coolDown: 1000 * 4,
-  category: 'categories.native',
+  category: 'category.native',
   execute: async (message) => {
     const embed = new app.Embed()
       .setColor(Deno.env.get('EMBED_COLOR') || '#57FF9A')

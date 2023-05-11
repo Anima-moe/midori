@@ -19,23 +19,31 @@ export default {
     succ: {
       command: 'Tudo certo!',
     },
+    or: 'ou',
+    everyone: 'Todo mundo',
   },
   command: {
     help: {
       defaultArgument: 'Exibe esta mensagem de ajuda.',
       arguments: 'Argumentos',
-      permissions: '🔑 Permissões',
-      aliases: '🪴 Aliases',
+      permissions: 'Permissões necessárias',
+      roles: 'Cargos permitidos',
+      aliases: 'Sinônimos',
       examples: 'Exemplos',
       description: 'Descrição',
-      cooldown: '⏳ Cooldown',
-      usage: '🛡️ Uso',
+      cooldown: 'Cooldown',
+      usage: 'Uso',
       name: 'Nome',
-      category: '🏷️ Categoria',
-      command: '📦 Comando',
+      category: 'Categoria',
+      command: 'Comando',
       title: 'Ajuda',
       content:
         '```ahk\n-f --flag: ;Flag obrigatória\n-f --flag  ;Flag opcional\n\n<argumento>: ;Argumento obrigatório\n[argumento]  ;Argumento opcional\```',
+      menu: {
+        title: 'Ajuda',
+        content: '**Dica**:\nUtilize `-h` para ver instruçòes detalhadas sobre um comando.\nex: `{prefix}ping -h` ou `{prefix}ping --help`',
+        description: 'Exibe uma lista de comandos disponíveis.',
+      }
     },
     ping: {
       reply: '🏓 Pong!\n\nPing: **{latency}ms**\nComando processado em: **{processing}ms**',
@@ -78,26 +86,25 @@ export default {
       },
     },
     translateerror: {
-      error: {
-        noMessageReference:
-          'Não encontrei a mensagem de erro. Certifique-se de rodar este comando como resposta a uma mensagem reportando um erro.',
-        referenceMessageNotError:
-          'A mensagem referenciada não é uma mensagem de erro. Certifique-se de rodar este comando como resposta a uma mensagem reportando um erro.',
+      err: {
+        noMessageReference: 'Não encontrei a mensagem de erro.\n\nCertifique-se de rodar este comando como resposta a uma mensagem reportando um erro.',
+        referenceMessageNotError: 'A mensagem referenciada não é uma mensagem de erro.\n\nCertifique-se de rodar este comando como resposta a uma mensagem reportando um erro.',
       },
       description: 'Traduz uma mensagem de erro, extraindo os campos',
     },
     animeupdate: {
-      description: 'Busca, atualiza e retorna animes.',
+      description: 'Identifica a fonte, busca e atualiza informações de um anime no Anima.',
       usage: 'https://animeprovider.tld/anime/path',
     },
   },
-  categories: {
+  category: {
     generic: '📦 Genérico',
     moderation: '🛡️ Moderação',
     utility: '⚒️ Utilidade',
     fun: '🎈 Diversão',
-    anima: '📷 Anima',
-    native: '📦 Funcionamento',
+    anima: '🚀 Anima',
+    native: '📦 Core',
+    undefined: '🚧 Sem categoria'
   },
   permission: {
     CREATE_INSTANT_INVITE: 'Criar convite instantâneo',
