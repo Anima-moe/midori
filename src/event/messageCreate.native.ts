@@ -7,7 +7,7 @@ import {
   commands,
   NormalMessage,
 } from '@/app/command.ts'
-import { ensureCache } from '@/app/cache.ts'
+
 
 import { argParser, crayon, dayjs, harmony, t } from '@/deps.ts'
 import {
@@ -16,24 +16,16 @@ import {
   resolvePositionalArgument,
   safeAddReaction,
   safeRemoveReactions,
-  safeSendMessage,
   sendErrorEmbed,
   sendSuccessEmbed,
 } from '@/namespace/utils.native.ts'
+import { coolDownCache, globalCoolDownCache } from "../namespace/globlaStates.native.ts";
 
 const logger = new Logger({
   logLevel: Deno.env.get('LOG_LEVEL') as any || 'debug',
   prefix: 'CommandHandler',
 })
 
-const coolDownCache = ensureCache<dayjs.Dayjs>(
-  'cooldown',
-  Number(Deno.env.get('MAX_COOLDOWN') || 1000 * 60 * 30),
-)
-const globalCoolDownCache = ensureCache<dayjs.Dayjs>(
-  'globalCooldown',
-  Number(Deno.env.get('MAX_COOLDOWN') || 1000 * 60 * 30),
-)
 
 function resolveRoleCoolDown(
   roles?: string[],
