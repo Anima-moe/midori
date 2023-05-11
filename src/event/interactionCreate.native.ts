@@ -35,7 +35,6 @@ const event: Listener<'interactionCreate'> = {
       if (interactionHandler) {
         await interactionHandler(interaction)
       } else {
-        console.log('interaction not found', interaction_id)
         await interaction.reply({
           ephemeral: true,
           content: t(
