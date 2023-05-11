@@ -15,6 +15,10 @@ export default {
         invalidArgument:
           'Argumento inválido\n\nTente `{command} -h` ou `{command} --help`',
       },
+      interaction: {
+        notFound: 'Esta interação não está mais disponível.\nTalvez você tenha demorado muito para responder?',
+        noMessage: 'A mensagem relacionada a esta interaçào não foi encontrada ou não está mais disponível.'
+      }
     },
     succ: {
       command: 'Tudo certo!',
@@ -91,6 +95,10 @@ export default {
         referenceMessageNotError: 'A mensagem referenciada não é uma mensagem de erro. Certifique-se de rodar este comando como resposta a uma mensagem reportando um erro.',
       },
       description: 'Traduz uma mensagem de erro, extraindo os campos'
+    },
+    animeupdate: {
+      description: 'Busca, atualiza e retorna animes.',
+      usage: 'https://animeprovider.tld/anime/path'
     }
   },
   categories: {
@@ -99,6 +107,7 @@ export default {
     utility: '⚒️ Utilidade',
     fun: '🎈 Diversão',
     anima: '📷 Anima',
+    native: '📦 Funcionamento'
   },
   permission: {
     CREATE_INSTANT_INVITE: 'Criar convite instantâneo',
@@ -141,5 +150,9 @@ export default {
     SEND_MESSAGES_IN_THREADS: 'Enviar mensagens em threads',
     START_EMBEDDED_ACTIVITIES: 'Iniciar atividades incorporadas',
     MODERATE_MEMBERS: 'Moderar membros',
+  },
+  pagination: {
+    next: 'Próximo',
+    previous: 'Voltar',
   },
 }

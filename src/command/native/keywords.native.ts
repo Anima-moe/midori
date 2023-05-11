@@ -3,7 +3,6 @@ import { models } from '@/app/database.ts'
 import { harmony, orm, t } from '../../deps.ts'
 import Keyword from '@/model/keywords.ts'
 import {
-  safeSendMessage,
   sendErrorEmbed,
   sendSuccessEmbed,
 } from '../../namespace/utils.native.ts'
@@ -14,6 +13,7 @@ const KeywordManager = new Command({
   longDescription: 'command.keyword.longDescription',
   usage: '-a add -k "hello world" -r "Hello to you too!"',
   aliases: ['keyword', 'keywords', 'kw', 'kwm'],
+  category: 'categories.native',
   args: [
     {
       name: 'action',

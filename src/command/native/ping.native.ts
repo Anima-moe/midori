@@ -6,7 +6,7 @@ const Ping = new Command({
   description: 'command.ping.description',
   aliases: ['latency'],
   coolDown: 1000 * 4,
-  category: 'categories.utility',
+  category: 'categories.native',
   execute: async (message) => {
     const embed = new harmony.Embed()
       .setColor(Deno.env.get('EMBED_COLOR') || '#57FF9A')
