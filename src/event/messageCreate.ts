@@ -3,13 +3,10 @@ import { client } from '@/app/client.ts'
 import { EventListener } from '@/app/event.ts'
 import { ensureCache } from '@/app/cache.ts'
 
-import { harmony, orm, stringSimilarity, t } from '@/deps.ts'
+import { orm, stringSimilarity } from '@/deps.ts'
 import {
   isNormalMessage,
-  safeAddReaction,
-  safeRemoveReactions,
   safeSendMessage,
-  sendErrorEmbed,
 } from '@/namespace/utils.native.ts'
 
 import Keyword from '@/model/keywords.ts'
