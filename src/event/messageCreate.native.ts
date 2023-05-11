@@ -19,7 +19,7 @@ import {
   sendErrorEmbed,
   sendSuccessEmbed,
 } from '@/namespace/utils.native.ts'
-import { coolDownCache, globalCoolDownCache } from "../namespace/globlaStates.native.ts";
+import { coolDownCache, globalCoolDownCache } from "@/namespace/states.native.ts";
 
 const logger = new Logger({
   logLevel: Deno.env.get('LOG_LEVEL') as any || 'debug',
