@@ -170,9 +170,12 @@ export async function sendPaginatedEmbed(
   embeds: app.Embed[],
   options?: {
     content?: string
-    buttonStyle?: 'PRIMARY' | 'SECONDARY' | 'SUCCESS' | 'DANGER'
+    previousButtonStyle?: 'PRIMARY' | 'SECONDARY' | 'SUCCESS' | 'DANGER'
+    nextButtonStyle?: 'PRIMARY' | 'SECONDARY' | 'SUCCESS' | 'DANGER'
     previousButtonLabel?: string
     nextButtonLabel?: string
+    previousButtonEmoji?: app.MessageComponentEmoji
+    nextButtonEmoji?: app.MessageComponentEmoji
   },
 ) {
   app.addToState(`paginatedEmbed@${message.id}`)(embeds)
@@ -190,6 +193,9 @@ export async function sendPaginatedEmbed(
     Number(Deno.env.get('MAX_INTERACTION_TIME') || 60) * 1000,
   )
 
+  embeds[0]
+  .setFooter('1 / ' + embeds.length)
+
   await message.send({
     content: options?.content ? t(message.locale, options.content) : undefined,
     embeds: [embeds[0]],
@@ -198,7 +204,8 @@ export async function sendPaginatedEmbed(
       components: [
         {
           type: 'BUTTON',
-          style: 'RED',
+          style: options?.previousButtonStyle || 'PRIMARY',
+          emoji: options?.previousButtonEmoji,
           customID: `paginatePrev@${message.id}`,
           label: options?.previousButtonLabel
             ? t(message.locale, options.previousButtonLabel)
@@ -206,7 +213,8 @@ export async function sendPaginatedEmbed(
         },
         {
           type: 'BUTTON',
-          style: 'GREEN',
+          style: options?.nextButtonStyle || 'PRIMARY',
+          emoji: options?.nextButtonEmoji,
           customID: `paginateNext@${message.id}`,
           label: options?.nextButtonLabel
             ? t(message.locale, options.nextButtonLabel)

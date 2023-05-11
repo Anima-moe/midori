@@ -60,8 +60,6 @@ const event: app.event.Listener<'messageCreate'> = {
     const cmd: app.command.CustomCommand<any> | undefined = app.command
       .collection.resolve(key)
 
-    if (!cmd) return
-
     message.isFromBotOwner = message.author.id === Deno.env.get('BOT_OWNER')
     message.isFromGuildOwner = message?.guild?.ownerID === message.author.id
     message.args = {}
@@ -86,7 +84,6 @@ const event: app.event.Listener<'messageCreate'> = {
         'en-US'
 
       if (isSelfMention) {
-        console.log('Mentioned midori')
         return await sendSuccessEmbed(message, 'generic.mention', { prefix })
       }
     } catch (e) {
@@ -98,7 +95,9 @@ const event: app.event.Listener<'messageCreate'> = {
       await safeAddReaction(message, '1077894898331697162')
       return await sendErrorEmbed(message, 'generic.err.command.unknown')
     }
-
+    
+    if (!cmd) return
+    
     message.triggerCoolDown = async () => {
       if (cmd.options.globalCoolDown) {
         globalCoolDownCache.set(
@@ -228,12 +227,12 @@ const event: app.event.Listener<'messageCreate'> = {
 
         helpEmbed
           .addField(
-            t(message.locale, 'command.help.aliases'),
+            '🪴 ' + t(message.locale, 'command.help.aliases'),
             `\`\`\`${cmd.options.aliases?.join(', ')}\`\`\``,
             true,
           )
           .addField(
-            t(message.locale, 'command.help.cooldown'),
+            '⏳ ' + t(message.locale, 'command.help.cooldown'),
             `\`\`\`${cmd.options.coolDown ? cmd.options.coolDown / 1000 + 's' : '--'}${
               cmd.options?.roleCoolDown
                 ? '\n' +
@@ -243,15 +242,25 @@ const event: app.event.Listener<'messageCreate'> = {
             true,
           )
           .addField(
-            t(message.locale, 'command.help.usage'),
+            '🛡️ ' + t(message.locale, 'command.help.usage'),
             `\`\`\`${prefix}${cmd.options.name} ${t(message.locale, cmd.options.usage || '')}\`\`\``,
           )
           .addField(
-            t(message.locale, 'command.help.permissions'),
+            '🔑 ' + t(message.locale, 'command.help.permissions'),
             `\`\`\`${
               cmd.options.botOwnerOnly
                 ? 'Developer'
                 : cmd.options.requiredPermissions?.map((perm) => t(message.locale, `permission.${perm}`)).join(', ') ||
+                  '--'
+            }\`\`\``,
+            true,
+          )
+          .addField(
+            '🔑 ' + t(message.locale, 'command.help.roles'),
+            `\`\`\`${
+              cmd.options.botOwnerOnly
+                ? 'Developer'
+                : cmd.options.allowedRoles?.map((role) => role.charAt(0).toUpperCase() + role.slice(1)).join(', ') ||
                   '--'
             }\`\`\``,
             true,

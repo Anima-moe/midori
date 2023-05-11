@@ -24,6 +24,8 @@ export const paginateEmbed =
   (message: app.Message) =>
   async (embeds: app.Embed[]): Promise<number> => {
     if (message.embeds.length === 0) {
+      embeds[0]
+      .setFooter('1 / 1')
       await message.edit({ embeds: [embeds[0]] })
       return 0
     }
@@ -39,6 +41,9 @@ export const paginateEmbed =
       return arr[0]
     }
 
+    embeds[curr]
+    .setFooter(`${curr + 1} / ${embeds.length}`)
+    
     await message.edit({
       embeds: [
         getNextEmbed(embeds)(embeds[curr]),
