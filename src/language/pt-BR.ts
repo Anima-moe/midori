@@ -72,6 +72,13 @@ export default {
       args: {
         action: 'Response to send when the keyword is detected [only required for the "add" action]',
       }
+    },
+    translateerror: {
+      error: {
+        noMessageReference: 'Não encontrei a mensagem de erro. Certifique-se de rodar este comando como resposta a uma mensagem reportando um erro.',
+        referenceMessageNotError: 'A mensagem referenciada não é uma mensagem de erro. Certifique-se de rodar este comando como resposta a uma mensagem reportando um erro.',
+      },
+      description: 'Traduz uma mensagem de erro, extraindo os campos'
     }
   },
   categories: {
