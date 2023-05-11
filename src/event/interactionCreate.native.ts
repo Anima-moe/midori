@@ -1,45 +1,46 @@
 import type { EventListener } from '@/app/event.ts'
-import { harmony } from '@/deps.ts'
-import { resolve } from 'std/path'
-
-type interaction_handler = (interaction: harmony.Interaction) => Promise<void>
-
-const load_interactions = async (
-  base_path: string,
-): Promise<Map<string, interaction_handler>> => {
-  const ret = new Map()
-  const dir = Deno.readDir(base_path)
-
-  for await (const entry of dir) {
-    const path = base_path + '/' + entry.name
-
-    if (entry.isDirectory) {
-      (await load_interactions(path))
-        .forEach((v, k) => ret.set(k, v))
-      continue
-    }
-
-    const handler = await import(
-      'file://' + resolve(path)
-    ) as { default: (interaction: harmony.Interaction) => Promise<void> }
-    ret.set(entry.name.replace('.ts', ''), handler.default)
-  }
-
-  return ret
-}
-
-const handlers = await load_interactions('src/interactions')
+import { interactionHandlers } from "../namespace/states.native.ts"
+import { harmony, t } from '../deps.ts';
+import { client } from "../app/client.ts";
 
 const event: EventListener<'interactionCreate'> = {
-  description: '?',
+  description: 'Listens for interactions with native components (like pagination)',
   execute: async (interaction) => {
+    const message = interaction.message
+
+    if (!message) { return }
+
+    try {
+      const guildChannel = message?.channel as harmony.GuildTextChannel
+      const guildID = guildChannel?.guildID
+      const guild = await client.guilds.get(guildID)
+      const guildMember = await guild?.members.get(interaction.user.id)
+      
+      const userLocale = (await guildMember?.roles.array())?.find((role) =>
+        role.name.startsWith('lang:')
+      )?.name.replace('lang:', '')
+
+      userLocale && (message.locale = userLocale)
+    } catch {
+      message.locale = Deno.env.get('BOT_DEFAULT_LOCALE') || 'en-US'
+    }
+
     const interaction_id = (interaction.data as any).custom_id as
       | string
       | undefined
 
     if (interaction_id) {
-      const handler = handlers.get(interaction_id)
-      handler && await handler(interaction)
+      const interactionHandler = await interactionHandlers.get(interaction_id)
+
+      if (interactionHandler) {
+        await interactionHandler(interaction)
+      } else {
+        console.log('interaction not found', interaction_id)
+        await interaction.reply({
+          ephemeral: true,
+          content: t(interaction.message.locale, 'generic.err.interaction.notFound')
+        })
+      }
     }
   },
 }

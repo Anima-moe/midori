@@ -1,9 +1,9 @@
 import { harmony } from '@/deps.ts'
 
 export const INTERNAL_STATE: Map<string, unknown> = new Map()
-export const add_to_state = (key: string) => (value: unknown) =>
+export const addToClientState = (key: string) => (value: unknown) =>
   INTERNAL_STATE.set(key, value)
-export const get_from_state = <T>(key: string) =>
+export const getFromClientState = <T>(key: string) =>
   INTERNAL_STATE.get(key) as T | undefined
 
 // Start bot.

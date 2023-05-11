@@ -115,6 +115,9 @@ export type EventListener<EventName extends keyof harmony.ClientEvents> = {
       & (EventName extends 'messageCreate'
         ? ExtendedClientEvents['messageCreate']
         : void)
+      & (EventName extends 'interactionCreate'
+        ? ExtendedClientEvents['interactionCreate']
+        : void)
   ) => void
 }
 

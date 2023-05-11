@@ -1,6 +1,8 @@
 import { harmony, t } from '@/deps.ts'
 import { CommandOptions, NormalMessage } from '../app/command.ts'
-import Logger from '../app/core/logger.ts'
+import { interactionHandler, interactionHandlers } from "./states.native.ts";
+import { addToClientState, getFromClientState } from "../app/client.ts";
+import { paginate } from "../app/event.ts";
 
 export function isNormalMessage(
   message: harmony.Message,
@@ -138,4 +140,65 @@ export async function safeAddReaction(
   } catch {
     return await sendErrorEmbed(message, 'generic.err.command.unknown')
   }
+}
+
+export function generatePaginationButton(id: string, action: 'previous' | 'next'): interactionHandler {
+  return async (interaction) => {
+    if (!interaction.message) {
+      interactionHandlers.delete(`paginatedEmbed@${id}`)
+      return 
+    }
+
+    const embeds = getFromClientState<harmony.Embed[]>(`paginatedEmbed@${id}`)!
+    const current = getFromClientState<number>(`firstPaginatedEmbed@${id}`)!
+
+    await interaction.respond({
+      type: 'UPDATE_MESSAGE',
+    })
+
+    addToClientState(`firstPaginatedEmbed@${id}`)(
+      await paginate(action)(current)(interaction.message)(embeds),
+    )
+    return
+  }
+}
+
+export async function sendPaginatedEmbed(
+  message: NormalMessage,
+  embeds: harmony.Embed[],
+  options?: {
+    content?: string,
+    buttonStyle?: 'PRIMARY' | 'SECONDARY' | 'SUCCESS' | 'DANGER',
+    previousButtonLabel?: string,
+    nextButtonLabel?: string
+  }
+) {
+  addToClientState(`paginatedEmbed@${message.id}`)(embeds)
+  addToClientState(`firstPaginatedEmbed@${message.id}`)(0)
+
+  interactionHandlers.add(`paginatePrev@${message.id}`, generatePaginationButton(message.id, 'previous'), Number(Deno.env.get('MAX_INTERACTION_TIME') || 60) * 1000)
+
+  interactionHandlers.add(`paginateNext@${message.id}`, generatePaginationButton(message.id, 'next'), Number(Deno.env.get('MAX_INTERACTION_TIME') || 60) * 1000)
+
+  await message.send({
+    content: options?.content ? t(message.locale, options.content) : undefined,
+    embeds: [embeds[0]],
+    components: [{
+      type: 'ACTION_ROW',
+      components: [
+        {
+          type: 'BUTTON',
+          style: 'RED',
+          customID: `paginatePrev@${message.id}`,
+          label: options?.previousButtonLabel ? t(message.locale, options.previousButtonLabel) : t(message.locale, 'pagination.previous'),
+        },
+        {
+          type: 'BUTTON',
+          style: 'GREEN',
+          customID: `paginateNext@${message.id}`,
+          label: options?.nextButtonLabel ? t(message.locale, options.nextButtonLabel) : t(message.locale, 'pagination.next'),
+        },
+      ],
+    }]
+  })
 }
