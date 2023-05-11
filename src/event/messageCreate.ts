@@ -39,14 +39,19 @@ const event: EventListener<'messageCreate'> = {
       for (const keyword of keywordList || []) {
         const keywordTest = keyword.keyword.split('<<LOCALE_KEYWORD>>')[1]
 
-        let threshold = 0.5
+        let threshold = 0.6
+        const messageContent = message.content.split(' ')
 
-        if (message.content.split(' ').length > 5) {
-          threshold = 0.3
+        if (messageContent.length > 6) {
+          threshold = 0.35
         }
 
-        if (message.content.split(' ').length > 10) {
-          threshold = 0.4
+        if (messageContent.length > 10) {
+          threshold = 0.30
+        }
+
+        if (messageContent.length > 15) {
+          return
         }
 
         if (!keywordTest) continue
