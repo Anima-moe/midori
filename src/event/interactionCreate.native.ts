@@ -25,24 +25,32 @@ const event: Listener<'interactionCreate'> = {
       message.locale = Deno.env.get('BOT_DEFAULT_LOCALE') || 'en-US'
     }
 
-    const interaction_id = (interaction.data as any).custom_id as
-      | string
-      | undefined
+    try {
+      const interactionID = (interaction.data as any).custom_id as
+        | string
+        | undefined
+  
+      if (interactionID) {
+        const interactionHandler = await interactionHandlers.get(interactionID)
+  
+        if (interactionHandler) {
+          await interactionHandler(interaction)
+        } else {
+          await interaction.reply({
+            ephemeral: true,
+            content: t(
+              interaction.message.locale,
+              'generic.err.interaction.notFound',
+            ),
+          })
+        }
 
-    if (interaction_id) {
-      const interactionHandler = await interactionHandlers.get(interaction_id)
-
-      if (interactionHandler) {
-        await interactionHandler(interaction)
-      } else {
-        await interaction.reply({
-          ephemeral: true,
-          content: t(
-            interaction.message.locale,
-            'generic.err.interaction.notFound',
-          ),
-        })
+        // Persistent interactions:
+        const persistentInteraction = app.interaction.collection.resolve(interactionID)
+        persistentInteraction?.execute(interaction)
       }
+    } catch (e) {
+      console.error(e)
     }
   },
 }
