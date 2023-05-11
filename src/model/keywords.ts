@@ -1,11 +1,11 @@
-import { orm, SqlTable } from '@/deps.ts'
+import * as app from '@/app.ts'
 
-@orm.model()
-export class Keyword extends SqlTable {
-  @orm.column({ isPrimaryKey: true, type: 'string' })
+@app.orm.model()
+export class Keyword extends app.SqlTable {
+  @app.orm.column({ isPrimaryKey: true, type: 'string' })
   public keyword!: string
 
-  @orm.columnType('string')
+  @app.orm.columnType('string')
   public response!: string
 }
 

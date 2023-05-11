@@ -1,5 +1,4 @@
 import * as app from '@/app.ts'
-import { orm, t } from '@/deps.ts'
 import Keyword from '@/model/keywords.ts'
 import { sendErrorEmbed, sendSuccessEmbed } from '@/namespace/utils.native.ts'
 
@@ -64,7 +63,7 @@ const KeywordManager = new app.command.CustomCommand({
         .setColor('#f5b342')
         .setDescription('\u200b')
         .setDescription(
-          t(message.locale, 'command.keyword.tips.noResponseOnList'),
+          app.t(message.locale, 'command.keyword.tips.noResponseOnList'),
         )
       message.customData.tips.push(embed)
     }
@@ -72,14 +71,14 @@ const KeywordManager = new app.command.CustomCommand({
     if (message.args.action === 'remove' && message.args.response) {
       const embed = new app.Embed()
         .setColor('#f5b342')
-        .setDescription(t(message.locale, 'command.keyword.tips.noArgsOnList'))
+        .setDescription(app.t(message.locale, 'command.keyword.tips.noArgsOnList'))
       message.customData.tips.push(embed)
     }
 
     const tableResolvable = app.database.models.get('keyword')
     if (!tableResolvable) throw new Error('Table not found')
 
-    const availableKeywords = await orm.findMany(tableResolvable, {})
+    const availableKeywords = await app.orm.findMany(tableResolvable, {})
 
     message.customData.registeredKeywords = availableKeywords
   },
@@ -107,7 +106,7 @@ const KeywordManager = new app.command.CustomCommand({
         const keywordModel = new Keyword()
         keywordModel.keyword = `${message.args.locale || 'pt-BR'}<<LOCALE_KEYWORD>>${keyword}`
         keywordModel.response = response
-        orm.save(keywordModel)
+        app.orm.save(keywordModel)
 
         await sendSuccessEmbed(message, 'command.keyword.add.succ', {
           keyword: message.args.keyword,
@@ -120,7 +119,7 @@ const KeywordManager = new app.command.CustomCommand({
         if (!tableResolvable) throw new Error('Table not found')
         const arg = message.args.keyword as string
 
-        orm.delete(tableResolvable, {
+        app.orm.delete(tableResolvable, {
           where: {
             clause: 'keyword = ?',
             values: [`${message.args.locale}<<LOCALE_KEYWORD>>${arg}`],
@@ -139,7 +138,7 @@ const KeywordManager = new app.command.CustomCommand({
 
         const embed = new app.Embed()
           .setColor(Deno.env.get('EMBED_COLOR') || '#57FF9A')
-          .setTitle(t(message.locale, 'command.keyword.list.title'))
+          .setTitle(app.t(message.locale, 'command.keyword.list.title'))
 
         if (registeredKeywords.length > 0) {
           registeredKeywords.forEach((keyword: Keyword) => {
@@ -147,24 +146,24 @@ const KeywordManager = new app.command.CustomCommand({
             const kwLocale = keyword.keyword.split('<<LOCALE_KEYWORD>>')[0]
 
             embed.addField(
-              t(message.locale, 'command.keyword.generic.keyword'),
+              app.t(message.locale, 'command.keyword.generic.keyword'),
               `\`\`\`${kw}\`\`\``,
               true,
             )
             embed.addField(
-              t(message.locale, 'command.keyword.generic.response'),
+              app.t(message.locale, 'command.keyword.generic.response'),
               `${keyword.response}`,
               true,
             )
             embed.addField(
-              t(message.locale, 'command.keyword.generic.locale'),
+              app.t(message.locale, 'command.keyword.generic.locale'),
               `\`\`\`${kwLocale}\`\`\``,
               true,
             )
           })
         } else {
           embed.setDescription(
-            t(message.locale, 'command.keyword.err.noKeywords'),
+            app.t(message.locale, 'command.keyword.err.noKeywords'),
           )
         }
 

@@ -1,4 +1,3 @@
-import { t } from '@/deps.ts'
 import { interactionHandler, interactionHandlers, paginateEmbed } from './states.native.ts'
 import * as app from '@/app.ts'
 import { NormalMessage } from '../../@types/event.d.ts'
@@ -88,7 +87,7 @@ export async function sendErrorEmbed(
   const embed = await new app.Embed()
     .setColor('RED')
     .setDescription(
-      t(message.locale, content || 'generic.err.command.unknown', args),
+      app.t(message.locale, content || 'generic.err.command.unknown', args),
     )
   return await message.channel.send({ embeds: [embed] })
 }
@@ -101,7 +100,7 @@ export async function sendSuccessEmbed(
   const embed = await new app.Embed()
     .setColor('GREEN')
     .setDescription(
-      t(message.locale, content || 'command.success.generic', args),
+      app.t(message.locale, content || 'command.success.generic', args),
     )
   return await message.channel.send({ embeds: [embed] })
 }
@@ -113,7 +112,7 @@ export async function safeSendMessage(
 ) {
   try {
     return await message.channel.send(
-      t(message.locale, content || 'generic.succ.command', args),
+      app.t(message.locale, content || 'generic.succ.command', args),
     )
   } catch {
     await sendErrorEmbed(message, content || 'generic.err.command.unknown')
@@ -197,7 +196,7 @@ export async function sendPaginatedEmbed(
   .setFooter('1 / ' + embeds.length)
 
   await message.send({
-    content: options?.content ? t(message.locale, options.content) : undefined,
+    content: options?.content ? app.t(message.locale, options.content) : undefined,
     embeds: [embeds[0]],
     components: [{
       type: 'ACTION_ROW',
@@ -208,8 +207,8 @@ export async function sendPaginatedEmbed(
           emoji: options?.previousButtonEmoji,
           customID: `paginatePrev@${message.id}`,
           label: options?.previousButtonLabel
-            ? t(message.locale, options.previousButtonLabel)
-            : t(message.locale, 'pagination.previous'),
+            ? app.t(message.locale, options.previousButtonLabel)
+            : app.t(message.locale, 'pagination.previous'),
         },
         {
           type: 'BUTTON',
@@ -217,8 +216,8 @@ export async function sendPaginatedEmbed(
           emoji: options?.nextButtonEmoji,
           customID: `paginateNext@${message.id}`,
           label: options?.nextButtonLabel
-            ? t(message.locale, options.nextButtonLabel)
-            : t(message.locale, 'pagination.next'),
+            ? app.t(message.locale, options.nextButtonLabel)
+            : app.t(message.locale, 'pagination.next'),
         },
       ],
     }],

@@ -1,5 +1,5 @@
 import { CustomCommand } from '@/app/command.ts'
-import { dayjs, t } from '@/deps.ts'
+import { dayjs } from '@/deps.ts'
 import * as app from '@/app.ts'
 
 const Ping = new CustomCommand({
@@ -12,7 +12,7 @@ const Ping = new CustomCommand({
     const embed = new app.Embed()
       .setColor(Deno.env.get('EMBED_COLOR') || '#57FF9A')
       .setDescription(
-        t(message.locale, 'command.ping.reply', {
+        app.t(message.locale, 'command.ping.reply', {
           latency: message.client.gateway.ping,
           processing: dayjs(dayjs().unix() - dayjs(message.timestamp).unix())
             .millisecond(),

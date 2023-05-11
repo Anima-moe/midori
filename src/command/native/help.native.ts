@@ -1,5 +1,4 @@
 import * as app from '@/app.ts'
-import { t } from "@/deps.ts";
 import { sendPaginatedEmbed } from '../../namespace/utils.native.ts';
 
 function splitArray<T>(arr: T[]): T[][] {
@@ -51,10 +50,10 @@ export default new app.command.CustomCommand({
     
     commandsChunks.forEach( chunk => {
       const commandsEmbed = new app.Embed()
-        .setDescription(t(message.locale, 'command.help.menu.content', { prefix: app.client.prefix as string }))
+        .setDescription(app.t(message.locale, 'command.help.menu.content', { prefix: app.client.prefix as string }))
         .setColor(Deno.env.get('EMBED_COLOR') || '#36393f')
         .setAuthor({
-          name: t(message.locale, 'command.help.menu.title'),
+          name: app.t(message.locale, 'command.help.menu.title'),
           icon_url: 'https://em-content.zobj.net/thumbs/120/microsoft/319/package_1f4e6.png'
         })
 
@@ -62,10 +61,10 @@ export default new app.command.CustomCommand({
         commandsEmbed.addField({
           name: ` `,
           value: `\`\`\`ansi
-[30m┌[0m[41m[1m  ${app.client.prefix}${command.name}  [0m[30m  @  ${t(message.locale, `${command.category || 'category.undefined'}`)}[0m
-[30m├[32m ${t(message.locale, command.description)}[0m
+[30m┌[0m[41m[1m  ${app.client.prefix}${command.name}  [0m[30m  @  ${app.t(message.locale, `${command.category || 'category.undefined'}`)}[0m
+[30m├[32m ${app.t(message.locale, command.description)}[0m
 [30m│
-[30m├[30m [31m${t(message.locale, 'command.help.aliases')}[0m
+[30m├[30m [31m${app.t(message.locale, 'command.help.aliases')}[0m
 [30m└[30m${app.client.prefix}[32m${command.aliases?.join(`[30m, ${app.client.prefix}[32m`) || '--'}[0m
 
 \`\`\`
