@@ -10,13 +10,19 @@ const Ping = new Command({
   execute: async (message) => {
     const embed = new harmony.Embed()
       .setColor(Deno.env.get('EMBED_COLOR') || '#57FF9A')
-      .setDescription(t(message.locale, 'command.ping.reply', { latency: message.client.gateway.ping, processing: dayjs(dayjs().unix() - dayjs(message.timestamp).unix()).millisecond() }))
-      
+      .setDescription(
+        t(message.locale, 'command.ping.reply', {
+          latency: message.client.gateway.ping,
+          processing: dayjs(dayjs().unix() - dayjs(message.timestamp).unix())
+            .millisecond(),
+        }),
+      )
+
     await message.channel.send(embed)
   },
   afterExecute: async (message) => {
     await message.triggerCoolDown()
-  }
+  },
 })
 
 export default Ping

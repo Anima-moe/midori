@@ -2,7 +2,11 @@ import { Command } from '@/app/command.ts'
 import { models } from '@/app/database.ts'
 import { harmony, orm, t } from '../../deps.ts'
 import Keyword from '@/model/keywords.ts'
-import { safeSendMessage, sendErrorEmbed, sendSuccessEmbed } from '../../namespace/utils.native.ts'
+import {
+  safeSendMessage,
+  sendErrorEmbed,
+  sendSuccessEmbed,
+} from '../../namespace/utils.native.ts'
 
 const KeywordManager = new Command({
   name: 'keywordmanager',
@@ -36,7 +40,7 @@ const KeywordManager = new Command({
       description: 'command.keyword.args.locale',
       required: false,
       default: 'pt-BR',
-    }
+    },
   ],
   allowedRoles: ['staff', 'mod'],
   beforeExecute: async (message) => {
@@ -45,7 +49,10 @@ const KeywordManager = new Command({
       registeredKeywords: [],
     }
 
-    if (message.args.action === 'add' && (!message.args.keyword || !message.args.response)) {
+    if (
+      message.args.action === 'add' &&
+      (!message.args.keyword || !message.args.response)
+    ) {
       throw new Error('generic.err.command.missingArgument')
     }
 
@@ -53,11 +60,16 @@ const KeywordManager = new Command({
       throw new Error('generic.err.command.missingArgument')
     }
 
-    if (message.args.action === 'list' && (message.args.keyword || message.args.response)) {
+    if (
+      message.args.action === 'list' &&
+      (message.args.keyword || message.args.response)
+    ) {
       const embed = new harmony.Embed()
         .setColor('#f5b342')
         .setDescription('\u200b')
-        .setDescription(t(message.locale, 'command.keyword.tips.noResponseOnList'))
+        .setDescription(
+          t(message.locale, 'command.keyword.tips.noResponseOnList'),
+        )
       message.customData.tips.push(embed)
     }
 
@@ -72,9 +84,8 @@ const KeywordManager = new Command({
     if (!tableResolvable) throw new Error('Table not found')
 
     const availableKeywords = await orm.findMany(tableResolvable, {})
-    
+
     message.customData.registeredKeywords = availableKeywords
-  
   },
   execute: async (message) => {
     switch (message.args.action) {
@@ -82,10 +93,15 @@ const KeywordManager = new Command({
         const keyword = message.args.keyword as string
         const response = message.args.response as string
 
-        const { registeredKeywords } = message.customData as { registeredKeywords: Keyword[] }
+        const { registeredKeywords } = message.customData as {
+          registeredKeywords: Keyword[]
+        }
 
         if (registeredKeywords.find((kw: Keyword) => kw.keyword === keyword)) {
-          await sendErrorEmbed(message, 'command.keyword.errors.keywordAlreadyRegistered')
+          await sendErrorEmbed(
+            message,
+            'command.keyword.errors.keywordAlreadyRegistered',
+          )
           return
         }
 
@@ -93,65 +109,77 @@ const KeywordManager = new Command({
         if (!tableResolvable) throw new Error('Table not found')
 
         const keywordModel = new Keyword()
-        keywordModel.keyword = `${message.args.locale || 'pt-BR'}<<LOCALE_KEYWORD>>${keyword}`
+        keywordModel.keyword = `${
+          message.args.locale || 'pt-BR'
+        }<<LOCALE_KEYWORD>>${keyword}`
         keywordModel.response = response
         orm.save(keywordModel)
-        
-        await sendSuccessEmbed(message, 'command.keyword.add.succ', { keyword: message.args.keyword })
 
-        break;
+        await sendSuccessEmbed(message, 'command.keyword.add.succ', {
+          keyword: message.args.keyword,
+        })
+
+        break
       }
       case 'remove': {
         const tableResolvable = models.get('keyword')
         if (!tableResolvable) throw new Error('Table not found')
         const arg = message.args.keyword as string
-        
-      
+
         orm.delete(tableResolvable, {
           where: {
             clause: 'keyword = ?',
-            values: [`${message.args.locale}<<LOCALE_KEYWORD>>${arg}`]
-          }
+            values: [`${message.args.locale}<<LOCALE_KEYWORD>>${arg}`],
+          },
         })
 
-        await sendSuccessEmbed(message, 'command.keyword.remove.succ', { keyword: message.args.keyword })
-        break;
+        await sendSuccessEmbed(message, 'command.keyword.remove.succ', {
+          keyword: message.args.keyword,
+        })
+        break
       }
       case 'list': {
-        const { registeredKeywords } = message.customData as { registeredKeywords: Keyword[] }
+        const { registeredKeywords } = message.customData as {
+          registeredKeywords: Keyword[]
+        }
 
         const embed = new harmony.Embed()
           .setColor(Deno.env.get('EMBED_COLOR') || '#57FF9A')
           .setTitle(t(message.locale, 'command.keyword.list.title'))
-        
+
         if (registeredKeywords.length > 0) {
           registeredKeywords.forEach((keyword: Keyword) => {
             const kw = keyword.keyword.split('<<LOCALE_KEYWORD>>')[1]
             const kwLocale = keyword.keyword.split('<<LOCALE_KEYWORD>>')[0]
 
             embed.addField(
-              t(message.locale, 'command.keyword.generic.keyword'), 
-              `\`\`\`${kw}\`\`\``, true
+              t(message.locale, 'command.keyword.generic.keyword'),
+              `\`\`\`${kw}\`\`\``,
+              true,
             )
             embed.addField(
-              t(message.locale, 'command.keyword.generic.response'), 
-              `${keyword.response}`, true
+              t(message.locale, 'command.keyword.generic.response'),
+              `${keyword.response}`,
+              true,
             )
             embed.addField(
               t(message.locale, 'command.keyword.generic.locale'),
-              `\`\`\`${kwLocale}\`\`\``, true
+              `\`\`\`${kwLocale}\`\`\``,
+              true,
             )
           })
         } else {
-          embed.setDescription(t(message.locale, 'command.keyword.err.noKeywords'))
+          embed.setDescription(
+            t(message.locale, 'command.keyword.err.noKeywords'),
+          )
         }
 
-        await message.reply( { embeds:[...message.customData.tips, embed] } )
+        await message.reply({ embeds: [...message.customData.tips, embed] })
 
-        break;
+        break
       }
     }
-  }
+  },
 })
 
 export default KeywordManager

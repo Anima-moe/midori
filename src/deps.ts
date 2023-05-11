@@ -7,7 +7,7 @@ import { crayon } from 'https://deno.land/x/crayon@3.3.3/mod.ts'
 import dayjs from 'npm:dayjs@1.11.7'
 import parser from 'https://deno.land/x/yargs_parser@yargs-parser-v21.1.1-deno/deno.ts'
 import { Cache } from 'https://deno.land/x/local_cache@1.0/mod.ts'
-import * as stringSimilarity from "https://deno.land/x/string_similarity@v1.0.1/mod.ts"
+import * as stringSimilarity from 'https://deno.land/x/string_similarity@v1.0.1/mod.ts'
 import {
   initTranslation,
   load,
@@ -39,6 +39,6 @@ export {
   orm,
   parser as argParser,
   SqlTable,
+  stringSimilarity,
   t,
-  stringSimilarity
 }

@@ -24,10 +24,12 @@ handler.on('load', async (filePath) => {
     }
 
     if (!table.identifier) {
-      throw new Error(`No identifier found in ${tableBreadcrumb}, export identifier const with table name`)
+      throw new Error(
+        `No identifier found in ${tableBreadcrumb}, export identifier const with table name`,
+      )
     }
-    
-    models.add(table.identifier,  table.default)
+
+    models.add(table.identifier, table.default)
 
     logger.success(
       `Loaded ${
@@ -45,7 +47,6 @@ export const models =
     public add(identifier: string, table: new () => SqlTable) {
       this.set(identifier, table)
     }
-
   })()
 
 export default handler
