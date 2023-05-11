@@ -97,9 +97,7 @@ export default class Logger {
       prefixSize - 2
     return this._prefix(level) + ' ' +
       this._message(message) +
-      (totalSpaces > 0
-        ? ' '.repeat(totalSpaces)
-        : '\n' + ' '.repeat(columns - stampSize - prefixSize)) +
+      (totalSpaces > 0 ? ' '.repeat(totalSpaces) : '\n' + ' '.repeat(columns - stampSize - prefixSize)) +
       this._stamp()
   }
 

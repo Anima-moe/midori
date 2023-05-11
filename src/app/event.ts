@@ -35,11 +35,9 @@ handler.on('load', async (filePath) => {
     }
 
     logger.success(
-      `Listening to ${
-        baseName.includes('.native') && crayon.green('native ') || ''
-      }event "${crayon.lightCyan(clearName)}" - ${
-        crayon.lightBlack(event.default.description)
-      }`,
+      `Listening to ${baseName.includes('.native') && crayon.green('native ') || ''}event "${
+        crayon.lightCyan(clearName)
+      }" - ${crayon.lightBlack(event.default.description)}`,
     )
 
     try {
@@ -74,11 +72,9 @@ export type Listener<EventName extends keyof harmony.ClientEvents> = {
   execute: (
     ...args:
       & harmony.ClientEvents[EventName]
-      & (EventName extends 'messageCreate'
-        ? ExtendedClientEvents['messageCreate']
+      & (EventName extends 'messageCreate' ? ExtendedClientEvents['messageCreate']
         : void)
-      & (EventName extends 'interactionCreate'
-        ? ExtendedClientEvents['interactionCreate']
+      & (EventName extends 'interactionCreate' ? ExtendedClientEvents['interactionCreate']
         : void)
   ) => void
 }

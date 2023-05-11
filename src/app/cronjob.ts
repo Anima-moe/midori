@@ -66,9 +66,7 @@ handler.on('load', async (filePath) => {
   try {
     jobs.add(job.default)
     logger.success(
-      `Loaded job "${crayon.lightCyan(job.default.name)}" - ${
-        crayon.lightBlack(job.default.description)
-      }`,
+      `Loaded job "${crayon.lightCyan(job.default.name)}" - ${crayon.lightBlack(job.default.description)}`,
     )
   } catch (e) {
     logger.error(`Error while loading cronjob ${jobBreadcrumb}`)
@@ -81,43 +79,39 @@ handler.on('finish', () => {
   jobs.start(client)
 })
 
-export const jobs =
-  new (class CronjobCollection
-    extends harmony.Collection<string, CustomCronjob & { croner: Cron }> {
-    public validate(job: CustomCronjob) {
-      if (!job.name) throw new Error('Cronjob name is required')
-      if (!job.cron) throw new Error('Cronjob cron is required')
-      if (!job.execute) throw new Error('Cronjob execute is required')
-    }
+export const jobs = new (class CronjobCollection extends harmony.Collection<string, CustomCronjob & { croner: Cron }> {
+  public validate(job: CustomCronjob) {
+    if (!job.name) throw new Error('Cronjob name is required')
+    if (!job.cron) throw new Error('Cronjob cron is required')
+    if (!job.execute) throw new Error('Cronjob execute is required')
+  }
 
-    public resolve(name: string) {
-      return this.find((job) => job.name === name)
-    }
+  public resolve(name: string) {
+    return this.find((job) => job.name === name)
+  }
 
-    public add(job: CustomCronjob) {
-      this.validate(job)
-      const cron = new Cron(job.cron, {
-        timezone: job.timezone,
-        name: job.name,
-        catch: job.onError,
-        maxRuns: job.maxRuns,
-        unref: true,
-        paused: job.manual,
-      }, job.execute.bind(this, client))
-      this.set(job.name, { ...job, croner: cron })
-    }
+  public add(job: CustomCronjob) {
+    this.validate(job)
+    const cron = new Cron(job.cron, {
+      timezone: job.timezone,
+      name: job.name,
+      catch: job.onError,
+      maxRuns: job.maxRuns,
+      unref: true,
+      paused: job.manual,
+    }, job.execute.bind(this, client))
+    this.set(job.name, { ...job, croner: cron })
+  }
 
-    public start(client: harmony.Client) {
-      this.forEach((job) => {
-        if (job.immediate) {
-          job.execute.bind(this, client)(job)
-        }
+  public start(client: harmony.Client) {
+    this.forEach((job) => {
+      if (job.immediate) {
+        job.execute.bind(this, client)(job)
+      }
 
-        logger.info(
-          `Starting job "${crayon.lightCyan(job.name)}" - ${
-            crayon.lightBlack(job.cron)
-          }`,
-        )
-      })
-    }
-  })()
+      logger.info(
+        `Starting job "${crayon.lightCyan(job.name)}" - ${crayon.lightBlack(job.cron)}`,
+      )
+    })
+  }
+})()

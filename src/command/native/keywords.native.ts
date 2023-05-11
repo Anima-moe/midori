@@ -105,9 +105,7 @@ const KeywordManager = new app.command.CustomCommand({
         if (!tableResolvable) throw new Error('Table not found')
 
         const keywordModel = new Keyword()
-        keywordModel.keyword = `${
-          message.args.locale || 'pt-BR'
-        }<<LOCALE_KEYWORD>>${keyword}`
+        keywordModel.keyword = `${message.args.locale || 'pt-BR'}<<LOCALE_KEYWORD>>${keyword}`
         keywordModel.response = response
         orm.save(keywordModel)
 

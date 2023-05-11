@@ -1,4 +1,4 @@
-import { CustomCommand } from "@/app/command.ts";
+import { CustomCommand } from '@/app/command.ts'
 
 export default new CustomCommand({
   name: 'animeupdate',
@@ -6,11 +6,8 @@ export default new CustomCommand({
   description: 'command.animeupdate.description',
   usage: 'command.animeupdate.usage',
   beforeExecute: async (_message) => {
-
   },
   execute: async (message) => {
-    
-
     await message.send('')
-  }
+  },
 })

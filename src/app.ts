@@ -1,4 +1,4 @@
-export { client, addToState, getFromState, getClient, _internalState } from './app/client.ts'
+export { _internalState, addToState, client, getClient, getFromState } from './app/client.ts'
 export * as cache from './app/cache.ts'
 export * as command from './app/command.ts'
 export * as event from './app/event.ts'

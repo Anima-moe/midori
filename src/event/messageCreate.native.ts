@@ -12,14 +12,13 @@ import {
   sendErrorEmbed,
   sendSuccessEmbed,
 } from '@/namespace/utils.native.ts'
-import { coolDownCache, globalCoolDownCache } from "@/namespace/states.native.ts"
-import { NormalMessage } from "../../@types/event.d.ts";
+import { coolDownCache, globalCoolDownCache } from '@/namespace/states.native.ts'
+import { NormalMessage } from '../../@types/event.d.ts'
 
 const logger = new Logger({
   logLevel: Deno.env.get('LOG_LEVEL') as any || 'debug',
   prefix: 'CommandHandler',
 })
-
 
 function resolveRoleCoolDown(
   roles?: string[],
@@ -58,7 +57,8 @@ const event: app.event.Listener<'messageCreate'> = {
     if (!message.content.startsWith(prefix) && !isSelfMention) return
 
     const key = message.content.split(/\s+/)[0].slice(prefix.length)
-    const cmd: app.command.CustomCommand<any> | undefined = app.command.collection.resolve(key)
+    const cmd: app.command.CustomCommand<any> | undefined = app.command
+      .collection.resolve(key)
 
     if (!cmd) return
 
@@ -66,8 +66,7 @@ const event: app.event.Listener<'messageCreate'> = {
     message.isFromGuildOwner = message?.guild?.ownerID === message.author.id
     message.args = {}
     message.positionalArgs = {}
-    
-    
+
     // Discord sometimes reports 404 on stuff out of cache, meaning some of those functions might throw an error. Welcome to the try catch hell.
     try {
       message.send = async function (
@@ -76,11 +75,11 @@ const event: app.event.Listener<'messageCreate'> = {
       ) {
         return await this.channel.send(sent)
       }.bind(message)
-  
+
       if (cmd?.options.botOwnerOnly && !message.isFromBotOwner) {
         return await sendErrorEmbed(message, 'generic.err.command.botOwnerOnly')
       }
-      
+
       message.locale = (await message?.member?.roles.array())?.find((role) =>
         role.name.startsWith('lang:')
       )?.name.replace('lang:', '') || Deno.env.get('BOT_DEFAULT_LOCALE') ||
@@ -92,16 +91,13 @@ const event: app.event.Listener<'messageCreate'> = {
       }
     } catch (e) {
       logger.error(
-        `Error while handling command ${
-          crayon.lightCyan('messageCreate.native')
-        } execution`,
+        `Error while handling command ${crayon.lightCyan('messageCreate.native')} execution`,
       )
       console.error(e)
       await safeRemoveReactions(message)
       await safeAddReaction(message, '1077894898331697162')
       return await sendErrorEmbed(message, 'generic.err.command.unknown')
     }
-
 
     message.triggerCoolDown = async () => {
       if (cmd.options.globalCoolDown) {
@@ -136,16 +132,14 @@ const event: app.event.Listener<'messageCreate'> = {
         const hasPermissions = cmd.options.requiredPermissions.every((perm) => {
           return message.member?.permissions.has(perm)
         }) || message.isFromBotOwner
-  
+
         if (!hasPermissions) {
           return await sendErrorEmbed(message, 'command.error.noPermissions')
         }
       }
     } catch (e) {
       logger.error(
-        `Error while handling command ${
-          crayon.lightCyan('messageCreate.native')
-        } execution`,
+        `Error while handling command ${crayon.lightCyan('messageCreate.native')} execution`,
       )
       console.error(e)
       await safeRemoveReactions(message)
@@ -162,16 +156,14 @@ const event: app.event.Listener<'messageCreate'> = {
             r.name.toLowerCase() === role.toLocaleLowerCase()
           )
         ) || message.isFromBotOwner
-  
+
         if (!hasRoles) {
           return await sendErrorEmbed(message, 'command.error.noRoles')
         }
       }
     } catch (e) {
       logger.error(
-        `Error while handling command ${
-          crayon.lightCyan('messageCreate.native')
-        } execution`,
+        `Error while handling command ${crayon.lightCyan('messageCreate.native')} execution`,
       )
       console.error(e)
       await safeRemoveReactions(message)
@@ -181,7 +173,6 @@ const event: app.event.Listener<'messageCreate'> = {
 
     const cleanContent = message.content.slice(prefix.length + key.length)
       .trim()
-
 
     // Check & insert argumentos into message object.
     try {
@@ -216,9 +207,9 @@ const event: app.event.Listener<'messageCreate'> = {
                 ),
               }]
                 ?.map((arg) => {
-                  return `\n-${arg.flag} --${arg.name}${
-                    arg.required ? ':' : ''
-                  } \n;${t(message.locale, arg.description || '')}`
+                  return `\n-${arg.flag} --${arg.name}${arg.required ? ':' : ''} \n;${
+                    t(message.locale, arg.description || '')
+                  }`
                 })
                 .join('\n') || '--'
             }\`\`\``,
@@ -230,11 +221,7 @@ const event: app.event.Listener<'messageCreate'> = {
             .addField(
               t(message.locale, 'command.help.positionalArguments'),
               '\`\`\`ahk\n' + cmd.options.positionalArgs?.map((arg) => {
-                return `\n${
-                  arg.required
-                    ? `<${arg.name}>:`
-                    : `[${arg.name}]` + ` ;${arg.description}`
-                }`
+                return `\n${arg.required ? `<${arg.name}>:` : `[${arg.name}]` + ` ;${arg.description}`}`
               }) + '\`\`\`',
             )
         }
@@ -247,32 +234,25 @@ const event: app.event.Listener<'messageCreate'> = {
           )
           .addField(
             t(message.locale, 'command.help.cooldown'),
-            `\`\`\`${
-              cmd.options.coolDown ? cmd.options.coolDown / 1000 + 's' : '--'
-            }${
+            `\`\`\`${cmd.options.coolDown ? cmd.options.coolDown / 1000 + 's' : '--'}${
               cmd.options?.roleCoolDown
                 ? '\n' +
-                  cmd.options.roleCoolDown.map((role) =>
-                    `${role.role}: ${role.coolDown * 1000}s`
-                  ).join('\n')
+                  cmd.options.roleCoolDown.map((role) => `${role.role}: ${role.coolDown * 1000}s`).join('\n')
                 : ''
             }\`\`\``,
             true,
           )
           .addField(
             t(message.locale, 'command.help.usage'),
-            `\`\`\`${prefix}${cmd.options.name} ${
-              t(message.locale, cmd.options.usage || '')
-            }\`\`\``,
+            `\`\`\`${prefix}${cmd.options.name} ${t(message.locale, cmd.options.usage || '')}\`\`\``,
           )
           .addField(
             t(message.locale, 'command.help.permissions'),
             `\`\`\`${
               cmd.options.botOwnerOnly
                 ? 'Developer'
-                : cmd.options.requiredPermissions?.map((perm) =>
-                  t(message.locale, `permission.${perm}`)
-                ).join(', ') || '--'
+                : cmd.options.requiredPermissions?.map((perm) => t(message.locale, `permission.${perm}`)).join(', ') ||
+                  '--'
             }\`\`\``,
             true,
           )
@@ -314,8 +294,7 @@ const event: app.event.Listener<'messageCreate'> = {
         (cmd.options.coolDown || cmd.options.roleCoolDown) &&
         !message.isFromBotOwner
       ) {
-        const coolDown =
-          coolDownCache.get(`${message.author.id}.${cmd.options.name}`) ||
+        const coolDown = coolDownCache.get(`${message.author.id}.${cmd.options.name}`) ||
           globalCoolDownCache.get(`${cmd.options.name}`)
         const userRoles = (await message?.member?.roles.array())?.map(
           (role) => role.name.toLowerCase(),
@@ -364,7 +343,6 @@ const event: app.event.Listener<'messageCreate'> = {
         }),
       )
     }
-
   },
 }
 

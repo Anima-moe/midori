@@ -1,7 +1,7 @@
-import {  t } from '@/deps.ts'
-import { interactionHandler, interactionHandlers, paginateEmbed } from "./states.native.ts"
+import { t } from '@/deps.ts'
+import { interactionHandler, interactionHandlers, paginateEmbed } from './states.native.ts'
 import * as app from '@/app.ts'
-import { NormalMessage } from "../../@types/event.d.ts";
+import { NormalMessage } from '../../@types/event.d.ts'
 
 export function isNormalMessage(
   message: app.Message,
@@ -141,11 +141,14 @@ export async function safeAddReaction(
   }
 }
 
-export function generatePaginationButton(id: string, action: 'previous' | 'next'): interactionHandler {
+export function generatePaginationButton(
+  id: string,
+  action: 'previous' | 'next',
+): interactionHandler {
   return async (interaction) => {
     if (!interaction.message) {
       interactionHandlers.delete(`paginatedEmbed@${id}`)
-      return 
+      return
     }
 
     const embeds = app.getFromState<app.Embed[]>(`paginatedEmbed@${id}`)!
@@ -166,18 +169,26 @@ export async function sendPaginatedEmbed(
   message: NormalMessage,
   embeds: app.Embed[],
   options?: {
-    content?: string,
-    buttonStyle?: 'PRIMARY' | 'SECONDARY' | 'SUCCESS' | 'DANGER',
-    previousButtonLabel?: string,
+    content?: string
+    buttonStyle?: 'PRIMARY' | 'SECONDARY' | 'SUCCESS' | 'DANGER'
+    previousButtonLabel?: string
     nextButtonLabel?: string
-  }
+  },
 ) {
   app.addToState(`paginatedEmbed@${message.id}`)(embeds)
   app.addToState(`firstPaginatedEmbed@${message.id}`)(0)
 
-  interactionHandlers.add(`paginatePrev@${message.id}`, generatePaginationButton(message.id, 'previous'), Number(Deno.env.get('MAX_INTERACTION_TIME') || 60) * 1000)
+  interactionHandlers.add(
+    `paginatePrev@${message.id}`,
+    generatePaginationButton(message.id, 'previous'),
+    Number(Deno.env.get('MAX_INTERACTION_TIME') || 60) * 1000,
+  )
 
-  interactionHandlers.add(`paginateNext@${message.id}`, generatePaginationButton(message.id, 'next'), Number(Deno.env.get('MAX_INTERACTION_TIME') || 60) * 1000)
+  interactionHandlers.add(
+    `paginateNext@${message.id}`,
+    generatePaginationButton(message.id, 'next'),
+    Number(Deno.env.get('MAX_INTERACTION_TIME') || 60) * 1000,
+  )
 
   await message.send({
     content: options?.content ? t(message.locale, options.content) : undefined,
@@ -189,15 +200,19 @@ export async function sendPaginatedEmbed(
           type: 'BUTTON',
           style: 'RED',
           customID: `paginatePrev@${message.id}`,
-          label: options?.previousButtonLabel ? t(message.locale, options.previousButtonLabel) : t(message.locale, 'pagination.previous'),
+          label: options?.previousButtonLabel
+            ? t(message.locale, options.previousButtonLabel)
+            : t(message.locale, 'pagination.previous'),
         },
         {
           type: 'BUTTON',
           style: 'GREEN',
           customID: `paginateNext@${message.id}`,
-          label: options?.nextButtonLabel ? t(message.locale, options.nextButtonLabel) : t(message.locale, 'pagination.next'),
+          label: options?.nextButtonLabel
+            ? t(message.locale, options.nextButtonLabel)
+            : t(message.locale, 'pagination.next'),
         },
       ],
-    }]
+    }],
   })
 }

@@ -1,24 +1,20 @@
 export default {
   generic: {
-    mention:
-      '👋 Meu prefixo é `{prefix}`\n\nTente utilizar `{prefix}help` para ver meus comandos',
+    mention: '👋 Meu prefixo é `{prefix}`\n\nTente utilizar `{prefix}help` para ver meus comandos',
     err: {
       command: {
         coolDown: 'Você está em cooldown, tente novamente em {time}.',
         unknown: 'Ocorreu um erro ao executar o comando.',
         noPermissions: 'Você não tem permissão para executar este comando.',
         noRoles: 'Você não tem permissão para executar este comando.',
-        missingArgument:
-          'Um ou mais argumentos estão faltando\n\nTente `{command} -h` ou `{command} --help`',
-        missingPositionalArgument:
-          'Um ou mais argumentos estão faltando\n\nTente `{command} -h` ou `{command} --help`',
-        invalidArgument:
-          'Argumento inválido\n\nTente `{command} -h` ou `{command} --help`',
+        missingArgument: 'Um ou mais argumentos estão faltando\n\nTente `{command} -h` ou `{command} --help`',
+        missingPositionalArgument: 'Um ou mais argumentos estão faltando\n\nTente `{command} -h` ou `{command} --help`',
+        invalidArgument: 'Argumento inválido\n\nTente `{command} -h` ou `{command} --help`',
       },
       interaction: {
         notFound: 'Esta interação não está mais disponível.\nTalvez você tenha demorado muito para responder?',
-        noMessage: 'A mensagem relacionada a esta interaçào não foi encontrada ou não está mais disponível.'
-      }
+        noMessage: 'A mensagem relacionada a esta interaçào não foi encontrada ou não está mais disponível.',
+      },
     },
     succ: {
       command: 'Tudo certo!',
@@ -42,32 +38,24 @@ export default {
         '```ahk\n-f --flag: ;Flag obrigatória\n-f --flag  ;Flag opcional\n\n<argumento>: ;Argumento obrigatório\n[argumento]  ;Argumento opcional\```',
     },
     ping: {
-      reply:
-        '🏓 Pong!\n\nPing: **{latency}ms**\nComando processado em: **{processing}ms**',
-      description:
-        'Retorna o ping (latência) e tempo de processamento por comando do bot.',
+      reply: '🏓 Pong!\n\nPing: **{latency}ms**\nComando processado em: **{processing}ms**',
+      description: 'Retorna o ping (latência) e tempo de processamento por comando do bot.',
     },
     keyword: {
       description: 'Gerencia palavras-chave para respostas automáticas.',
-      longDescription:
-        'Adiciona, remove ou lista palavras-chave para respostas automáticas.',
+      longDescription: 'Adiciona, remove ou lista palavras-chave para respostas automáticas.',
       args: {
-        action:
-          'Ação a ser realizada na palavra-chave.\n;Ações disponíveis: "add", "remove", "list"',
-        keyword:
-          'Frase/palavra-chave a ser adicionada/removida\n;[necessário apenas para as ações "add" e "remove"]',
-        response:
-          'Resposta a ser enviada quando a palavra-chave for acionada\n;[necessário apenas para a ação "add"]',
+        action: 'Ação a ser realizada na palavra-chave.\n;Ações disponíveis: "add", "remove", "list"',
+        keyword: 'Frase/palavra-chave a ser adicionada/removida\n;[necessário apenas para as ações "add" e "remove"]',
+        response: 'Resposta a ser enviada quando a palavra-chave for acionada\n;[necessário apenas para a ação "add"]',
         locale: 'Idioma da palavra-chave\n;[deifinida como pt-BR se omitida]',
       },
       add: {
         succ: '🔑 **{keyword}** adicionada com sucesso!',
       },
       tips: {
-        noArgsOnList:
-          '💡 Dica! Você não precisa dos arguments `-k` nem `-r` para listar.',
-        noResponseOnList:
-          '💡 Dica! Você não precisa do argument `-r` para remover uma palavra chave.',
+        noArgsOnList: '💡 Dica! Você não precisa dos arguments `-k` nem `-r` para listar.',
+        noResponseOnList: '💡 Dica! Você não precisa do argument `-r` para remover uma palavra chave.',
       },
       list: {
         title: '📦 Palavras-chave registradas',
@@ -87,19 +75,21 @@ export default {
     response: {
       args: {
         action: 'Response to send when the keyword is detected [only required for the "add" action]',
-      }
+      },
     },
     translateerror: {
       error: {
-        noMessageReference: 'Não encontrei a mensagem de erro. Certifique-se de rodar este comando como resposta a uma mensagem reportando um erro.',
-        referenceMessageNotError: 'A mensagem referenciada não é uma mensagem de erro. Certifique-se de rodar este comando como resposta a uma mensagem reportando um erro.',
+        noMessageReference:
+          'Não encontrei a mensagem de erro. Certifique-se de rodar este comando como resposta a uma mensagem reportando um erro.',
+        referenceMessageNotError:
+          'A mensagem referenciada não é uma mensagem de erro. Certifique-se de rodar este comando como resposta a uma mensagem reportando um erro.',
       },
-      description: 'Traduz uma mensagem de erro, extraindo os campos'
+      description: 'Traduz uma mensagem de erro, extraindo os campos',
     },
     animeupdate: {
       description: 'Busca, atualiza e retorna animes.',
-      usage: 'https://animeprovider.tld/anime/path'
-    }
+      usage: 'https://animeprovider.tld/anime/path',
+    },
   },
   categories: {
     generic: '📦 Genérico',
@@ -107,7 +97,7 @@ export default {
     utility: '⚒️ Utilidade',
     fun: '🎈 Diversão',
     anima: '📷 Anima',
-    native: '📦 Funcionamento'
+    native: '📦 Funcionamento',
   },
   permission: {
     CREATE_INSTANT_INVITE: 'Criar convite instantâneo',

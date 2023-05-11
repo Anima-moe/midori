@@ -8,7 +8,9 @@ export interface EventMaker {
 
 interface ExtendedClientEvents {
   'messageCreate': [harmony.Message & NormalMessage]
-  'interactionCreate': [harmony.Interaction & { message: harmony.Message & { locale: string } }]
+  'interactionCreate': [
+    harmony.Interaction & { message: harmony.Message & { locale: string } },
+  ]
 }
 
 export type NormalMessage = harmony.Message & {

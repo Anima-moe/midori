@@ -1,7 +1,6 @@
 # Midori
 
-Midori is Anima's discord bot (not a maid, smh) Written like a framework over
-harmony running in Deno.
+Midori is Anima's discord bot (not a maid, smh) Written like a framework over harmony running in Deno.
 
 ### Running
 

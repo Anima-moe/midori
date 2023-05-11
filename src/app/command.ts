@@ -4,7 +4,7 @@ import { crayon, harmony } from '@/deps.ts'
 import { resolve } from 'https://deno.land/std@0.176.0/path/win32.ts'
 import { Translations } from 'https://deno.land/x/t_i18n@2.1.0/mod.ts'
 import ptBR from '../language/pt-BR.ts'
-import { NormalMessage } from "../../@types/event.d.ts";
+import { NormalMessage } from '../../@types/event.d.ts'
 
 // https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags
 export const PermissionFlags = {
@@ -273,11 +273,9 @@ handler.on('load', async (filePath) => {
       throw new Error(`File ${filePath} must export a command as default`)
     }
     logger.success(
-      `Loaded ${
-        commandFileName.includes('.native') ? crayon.green('native ') : ''
-      }command "${crayon.lightCyan(command.default.options.name)}" - ${
-        crayon.lightBlack(command.default.options.description)
-      }`,
+      `Loaded ${commandFileName.includes('.native') ? crayon.green('native ') : ''}command "${
+        crayon.lightCyan(command.default.options.name)
+      }" - ${crayon.lightBlack(command.default.options.description)}`,
     )
     collection.add(command.default)
   } catch (e) {
@@ -356,7 +354,9 @@ export const collection = new (class CommandCollection extends harmony.Collectio
   string,
   Options<keyof CommandMessageType>
 > {
-  public resolve(key: string): CustomCommand<keyof CommandMessageType> | undefined {
+  public resolve(
+    key: string,
+  ): CustomCommand<keyof CommandMessageType> | undefined {
     for (const [name, commandOptions] of this) {
       if (key === name || commandOptions.aliases?.includes(key)) {
         return new CustomCommand(commandOptions)

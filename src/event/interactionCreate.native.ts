@@ -1,7 +1,7 @@
 import type { Listener } from '@/app/event.ts'
-import { interactionHandlers } from "../namespace/states.native.ts"
-import { t } from '@/deps.ts';
-import { client } from "@/app/client.ts"
+import { interactionHandlers } from '../namespace/states.native.ts'
+import { t } from '@/deps.ts'
+import { client } from '@/app/client.ts'
 import * as app from '@/app.ts'
 
 const event: Listener<'interactionCreate'> = {
@@ -9,17 +9,16 @@ const event: Listener<'interactionCreate'> = {
   execute: async (interaction) => {
     const message = interaction.message
 
-    if (!message) { return }
+    if (!message) return
 
     try {
       const guildChannel = message?.channel as app.GuildTextChannel
       const guildID = guildChannel?.guildID
       const guild = await client.guilds.get(guildID)
       const guildMember = await guild?.members.get(interaction.user.id)
-      
-      const userLocale = (await guildMember?.roles.array())?.find((role) =>
-        role.name.startsWith('lang:')
-      )?.name.replace('lang:', '')
+
+      const userLocale = (await guildMember?.roles.array())?.find((role) => role.name.startsWith('lang:'))?.name
+        .replace('lang:', '')
 
       userLocale && (message.locale = userLocale)
     } catch {
@@ -39,7 +38,10 @@ const event: Listener<'interactionCreate'> = {
         console.log('interaction not found', interaction_id)
         await interaction.reply({
           ephemeral: true,
-          content: t(interaction.message.locale, 'generic.err.interaction.notFound')
+          content: t(
+            interaction.message.locale,
+            'generic.err.interaction.notFound',
+          ),
         })
       }
     }

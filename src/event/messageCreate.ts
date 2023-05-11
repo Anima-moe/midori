@@ -2,10 +2,7 @@ import Logger from '@/app/core/logger.ts'
 import * as app from '@/app.ts'
 
 import { orm, stringSimilarity } from '@/deps.ts'
-import {
-  isNormalMessage,
-  safeSendMessage,
-} from '@/namespace/utils.native.ts'
+import { isNormalMessage, safeSendMessage } from '@/namespace/utils.native.ts'
 
 import Keyword from '@/model/keywords.ts'
 

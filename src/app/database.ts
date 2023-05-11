@@ -32,9 +32,9 @@ handler.on('load', async (filePath) => {
     models.add(table.identifier, table.default)
 
     logger.success(
-      `Loaded ${
-        tableFileName.includes('.native') ? crayon.green('native ') : ''
-      }table "${crayon.lightCyan(table.identifier)}"`,
+      `Loaded ${tableFileName.includes('.native') ? crayon.green('native ') : ''}table "${
+        crayon.lightCyan(table.identifier)
+      }"`,
     )
   } catch (e) {
     logger.error(e.message)
@@ -42,10 +42,8 @@ handler.on('load', async (filePath) => {
   }
 })
 
-export const models =
-  new (class Table extends harmony.Collection<string, new () => SqlTable> {
-    public add(identifier: string, table: new () => SqlTable) {
-      this.set(identifier, table)
-    }
-  })()
-
+export const models = new (class Table extends harmony.Collection<string, new () => SqlTable> {
+  public add(identifier: string, table: new () => SqlTable) {
+    this.set(identifier, table)
+  }
+})()
