@@ -1,8 +1,7 @@
 import { harmony, t } from '@/deps.ts'
 import { CommandOptions, NormalMessage } from '../app/command.ts'
-import { interactionHandler, interactionHandlers } from "./states.native.ts";
-import { addToClientState, getFromClientState } from "../app/client.ts";
-import { paginate } from "../app/event.ts";
+import { interactionHandler, interactionHandlers, paginateEmbed } from "./states.native.ts"
+import { addToClientState, getFromClientState } from "../app/client.ts"
 
 export function isNormalMessage(
   message: harmony.Message,
@@ -157,7 +156,7 @@ export function generatePaginationButton(id: string, action: 'previous' | 'next'
     })
 
     addToClientState(`firstPaginatedEmbed@${id}`)(
-      await paginate(action)(current)(interaction.message)(embeds),
+      await paginateEmbed(action)(current)(interaction.message)(embeds),
     )
     return
   }

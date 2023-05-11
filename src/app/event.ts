@@ -68,44 +68,6 @@ export function validateEvent(event: EventMaker) {
   if (!event.description) throw new Error('Event must have a description')
   if (!event.execute) throw new Error('Event must have an execute function')
 }
-
-export const paginate =
-  (by: 'next' | 'previous') =>
-  (curr: number) =>
-  (message: harmony.Message) =>
-  async (embeds: harmony.Embed[]): Promise<number> => {
-    if (message.embeds.length === 0) {
-      await message.edit({ embeds: [embeds[0]] })
-      return 0
-    }
-
-    const indicator = by === 'next' ? 1 : -1
-    const get_next =
-      (arr: harmony.Embed[]) => (val: harmony.Embed): harmony.Embed => {
-        for (let index = 0; index < arr.length; index++) {
-          if (arr[index] === val) {
-            return by === 'next'
-              ? arr[index + indicator] || arr[0]
-              : arr[index + indicator] || arr[arr.length - 1]
-          }
-        }
-
-        return arr[0]
-      }
-
-    await message.edit({
-      embeds: [
-        get_next(embeds)(embeds[curr]),
-      ],
-    })
-
-    return curr === embeds.length - 1
-      ? 0
-      : curr === 0
-      ? embeds.length - 1
-      : curr + indicator
-  }
-
 export type EventListener<EventName extends keyof harmony.ClientEvents> = {
   description: string
   once?: boolean
