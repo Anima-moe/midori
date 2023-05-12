@@ -95,9 +95,9 @@ const event: app.event.Listener<'messageCreate'> = {
       await safeAddReaction(message, '1077894898331697162')
       return await sendErrorEmbed(message, 'generic.err.command.unknown')
     }
-    
+
     if (!cmd) return
-    
+
     message.triggerCoolDown = async () => {
       if (cmd.options.globalCoolDown) {
         globalCoolDownCache.set(
@@ -237,7 +237,9 @@ const event: app.event.Listener<'messageCreate'> = {
 @Everyone: ${cmd.options.coolDown ? dayjs.duration(cmd.options.coolDown * 1000).asMinutes() + 'min' : '--'}${
               cmd.options?.roleCoolDown
                 ? '\n' +
-                  cmd.options.roleCoolDown.map((role) => `@${role.role}: ${dayjs.duration(role.coolDown * 1000).asMinutes()}min`).join('\n')
+                  cmd.options.roleCoolDown.map((role) =>
+                    `@${role.role}: ${dayjs.duration(role.coolDown * 1000).asMinutes()}min`
+                  ).join('\n')
                 : ''
             }
             \`\`\``,

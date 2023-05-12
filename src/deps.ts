@@ -27,4 +27,17 @@ load('pt-BR', ptBR)
 dayjs.extend(relativeTime)
 dayjs.extend(duration)
 
-export { Cache, crayon, Cron, dayjs, harmony, initTranslation, orm, parser as argParser, SqlTable, stringSimilarity, t, scheduledJobs }
+export {
+  Cache,
+  crayon,
+  Cron,
+  dayjs,
+  harmony,
+  initTranslation,
+  orm,
+  parser as argParser,
+  scheduledJobs,
+  SqlTable,
+  stringSimilarity,
+  t,
+}

@@ -31,7 +31,9 @@ handler.on('load', async (filePath) => {
   try {
     collection.add(interaction.default)
     logger.success(
-      `Loaded interaction "${crayon.lightCyan(interaction.default.name)}" - ${crayon.lightBlack(interaction.default.description)}`,
+      `Loaded interaction "${crayon.lightCyan(interaction.default.name)}" - ${
+        crayon.lightBlack(interaction.default.description)
+      }`,
     )
   } catch (e) {
     logger.error(`Error while loading interaction ${interactionBreadcrumb}`)
@@ -39,7 +41,6 @@ handler.on('load', async (filePath) => {
     return
   }
 })
-
 
 export const collection = new (class CronjobCollection extends harmony.Collection<string, CustomInteraction> {
   public validate(interaction: CustomInteraction) {
@@ -55,7 +56,7 @@ export const collection = new (class CronjobCollection extends harmony.Collectio
 
   public add(interaction: CustomInteraction) {
     this.validate(interaction)
-    
+
     this.set(interaction.id, { ...interaction })
   }
 })()

@@ -1,8 +1,6 @@
 import * as app from '@/app.ts'
-import { sendPaginatedEmbed } from '@/namespace/utils.native.ts';
-import { splitArray } from "@/namespace/utils.ts";
-
-
+import { sendPaginatedEmbed } from '@/namespace/utils.native.ts'
+import { splitArray } from '@/namespace/utils.ts'
 
 export default new app.command.CustomCommand({
   name: 'help',
@@ -13,7 +11,7 @@ export default new app.command.CustomCommand({
     const commands = app.command.collection
 
     message.customData = {
-      commands
+      commands,
     }
   },
   execute: async (message) => {
@@ -33,37 +31,39 @@ export default new app.command.CustomCommand({
     const helpEmbeds: app.Embed[] = []
     const commands: app.command.CustomCommand<'guild'>['options'][] = []
 
-    Object.keys(categories).forEach( category => {
+    Object.keys(categories).forEach((category) => {
       const categoryCommands = categories[category]
 
-      categoryCommands.forEach( command => {
+      categoryCommands.forEach((command) => {
         commands.push(command)
       })
     })
 
     const commandsChunks = splitArray<app.command.CustomCommand<'guild'>['options']>(commands)
-    
-    commandsChunks.forEach( chunk => {
+
+    commandsChunks.forEach((chunk) => {
       const commandsEmbed = new app.Embed()
         .setDescription(app.t(message.locale, 'command.help.menu.content', { prefix: app.client.prefix as string }))
         .setColor(Deno.env.get('EMBED_COLOR') || '#36393f')
         .setAuthor({
           name: app.t(message.locale, 'command.help.menu.title'),
-          icon_url: 'https://em-content.zobj.net/thumbs/120/microsoft/319/package_1f4e6.png'
+          icon_url: 'https://em-content.zobj.net/thumbs/120/microsoft/319/package_1f4e6.png',
         })
 
-      chunk.sort().forEach( command => {
+      chunk.sort().forEach((command) => {
         commandsEmbed.addField({
           name: ` `,
           value: `\`\`\`ansi
-[30m┌[0m[41m[1m  ${app.client.prefix}${command.name}  [0m[30m  @  ${app.t(message.locale, `${command.category || 'category.undefined'}`)}[0m
+[30m┌[0m[41m[1m  ${app.client.prefix}${command.name}  [0m[30m  @  ${
+            app.t(message.locale, `${command.category || 'category.undefined'}`)
+          }[0m
 [30m├[32m ${app.t(message.locale, command.description)}[0m
 [30m│
 [30m├[30m [31m${app.t(message.locale, 'command.help.aliases')}[0m
 [30m└[30m${app.client.prefix}[32m${command.aliases?.join(`[30m, ${app.client.prefix}[32m`) || '--'}[0m
 
 \`\`\`
-`
+`,
         })
       })
 
@@ -77,5 +77,5 @@ export default new app.command.CustomCommand({
     } catch (e) {
       console.error(e)
     }
-  }
+  },
 })

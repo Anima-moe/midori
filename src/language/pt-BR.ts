@@ -42,9 +42,10 @@ export default {
         '```ahk\n-f --flag: ;Flag obrigatória\n-f --flag  ;Flag opcional\n\n<argumento>: ;Argumento obrigatório\n[argumento]  ;Argumento opcional\```',
       menu: {
         title: 'Ajuda',
-        content: '**Dica**:\nUtilize `-h` para ver instruçòes detalhadas sobre um comando.\nex: `{prefix}ping -h` ou `{prefix}ping --help`',
+        content:
+          '**Dica**:\nUtilize `-h` para ver instruçòes detalhadas sobre um comando.\nex: `{prefix}ping -h` ou `{prefix}ping --help`',
         description: 'Exibe uma lista de comandos disponíveis.',
-      }
+      },
     },
     ping: {
       reply: '🏓 Pong!\n\nPing: **{latency}ms**\nComando processado em: **{processing}ms**',
@@ -88,8 +89,10 @@ export default {
     },
     translateerror: {
       err: {
-        noMessageReference: 'Não encontrei a mensagem de erro.\n\nCertifique-se de rodar este comando como resposta a uma mensagem reportando um erro.',
-        referenceMessageNotError: 'A mensagem referenciada não é uma mensagem de erro.\n\nCertifique-se de rodar este comando como resposta a uma mensagem reportando um erro.',
+        noMessageReference:
+          'Não encontrei a mensagem de erro.\n\nCertifique-se de rodar este comando como resposta a uma mensagem reportando um erro.',
+        referenceMessageNotError:
+          'A mensagem referenciada não é uma mensagem de erro.\n\nCertifique-se de rodar este comando como resposta a uma mensagem reportando um erro.',
       },
       description: 'Traduz uma mensagem de erro, extraindo os campos',
     },
@@ -102,7 +105,7 @@ export default {
       err: {
         invalidAnime: 'Anime inválido. Verifique se o link está correto ou se o ID é válido.',
         fail: 'Falha ao atualizar anime.',
-        failToFetch: 'Falha ao obter dados do anime atualizado.'
+        failToFetch: 'Falha ao obter dados do anime atualizado.',
       },
       state: {
         start: 'Atualizando anime.',
@@ -114,13 +117,13 @@ export default {
         episodes: 'Processados',
         failedEpisodes: 'Ignorados',
         succeededEpisodes: 'Atualizados',
-      }
+      },
     },
     reportError: {
       description: 'Reporta um erro para a midori e sinaliza os desenvolvedores.',
       usage: 'dW0gZXhlbXBsbyBkZSBlcnJvIGFxdWksIHPDsyBwcmEgcG9yIG5vIHVzYWdlcw==',
       args: {
-        error: 'Código de erro gerado pelas aplicações do Anima.'
+        error: 'Código de erro gerado pelas aplicações do Anima.',
       },
       err: {
         noError: 'Não consegui identificar o erro reportado',
@@ -128,8 +131,8 @@ export default {
         invalidAnime: 'Anime inválido. Verifique se o link está correto ou se o ID é válido.',
       },
       state: {
-        start: 'Erro identificado, buscando recusos para anime:\n{anime}'
-      }
+        start: 'Erro identificado, buscando recusos para anime:\n{anime}',
+      },
     },
     clear: {
       description: 'Limpa mensagens do chat.',
@@ -139,7 +142,8 @@ export default {
       },
       err: {
         invalidAmount: 'Quantidade inválida. O valor deve ser um número inteiro entre 1 e 100.',
-        unknown: 'Erro desconhecido ao tentar apagar mensagens.\n\nObs: o discord não permite apagar mensagens com mais de 14 dias de existência.',
+        unknown:
+          'Erro desconhecido ao tentar apagar mensagens.\n\nObs: o discord não permite apagar mensagens com mais de 14 dias de existência.',
       },
       success: '🗑️ {amount} mensagens apagadas com sucesso.',
     },
@@ -148,7 +152,8 @@ export default {
       longDescription: 'Adiciona, remove ou lista tarefas agendadas para atualização de animes.',
       usage: '-a add -c "0 0 * * 0" -i 1',
       args: {
-        action: 'Ação a ser realizada na tarefa.\n;Ações disponíveis: "add", "remove"\n;Ao não providenciar nenhum argumento, uma agenda será exibida.',
+        action:
+          'Ação a ser realizada na tarefa.\n;Ações disponíveis: "add", "remove"\n;Ao não providenciar nenhum argumento, uma agenda será exibida.',
         id: 'Anima AnimeID.\n;[necessário apenas para as ações "add" e "remove"]',
         cron: 'Cron de agendamento da tarefa.\n;[necessário apenas para a ação "add"]',
       },
@@ -160,9 +165,9 @@ export default {
       success: {
         added: 'Tarefa agendada com sucesso!\nAnime: {anime}.\nCron: {cron} ({rawCron})',
         removed: 'Tarefa removida com sucesso!\nAnime: {anime}.\nCron: {cron} ({rawCron})',
-        fetching: 'Buscando informação dos animes agendados, isso pode demorar alguns segundos.'
-      }
-    }
+        fetching: 'Buscando informação dos animes agendados, isso pode demorar alguns segundos.',
+      },
+    },
   },
   category: {
     generic: '📦 Genérico',
@@ -171,7 +176,7 @@ export default {
     fun: '🎈 Diversão',
     anima: '🚀 Anima',
     native: '📦 Core',
-    undefined: '🚧 Sem categoria'
+    undefined: '🚧 Sem categoria',
   },
   permission: {
     CREATE_INSTANT_INVITE: 'Criar convite instantâneo',

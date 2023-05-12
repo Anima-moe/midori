@@ -1,10 +1,10 @@
 import * as app from '@/app.ts'
-import { Cron, scheduledJobs } from "@/deps.ts";
+import { Cron, scheduledJobs } from '@/deps.ts'
 
 import { getLocaleMetadata } from '@/namespace/anime.ts'
 import { sendPaginatedEmbed, sendSuccessEmbed } from '@/namespace/utils.native.ts'
-import { updateAnime } from "@/namespace/cli.ts";
-import { splitArray } from '@/namespace/utils.ts';
+import { updateAnime } from '@/namespace/cli.ts'
+import { splitArray } from '@/namespace/utils.ts'
 
 import Schedule from '@/model/schedules.ts'
 
@@ -36,7 +36,7 @@ export default new app.command.CustomCommand({
         }
 
         return true
-      }
+      },
     },
     {
       name: 'cron',
@@ -48,7 +48,7 @@ export default new app.command.CustomCommand({
   beforeExecute: async (message) => {
     message.customData = {}
     const eventsModel = app.database.models.get('schedule')
-    if (!eventsModel) { return }
+    if (!eventsModel) return
 
     const events = await app.orm.findMany(eventsModel, {})
 
@@ -59,29 +59,40 @@ export default new app.command.CustomCommand({
 
     const localeLookup = {
       'pt-BR': 'pt_BR',
-      'en-US': 'en'
+      'en-US': 'en',
     }
 
     // User provided no arguments
     // Show all schedules
     if (!message.args['action']) {
-
       const embedList: app.Embed[] = []
-      
-      const splitEvents = splitArray<{ cronjob: string, animeID: string }>(message.customData.events)
-      
-      const waitMessage = await sendSuccessEmbed(message, app.t(message.locale, 'command.animeschedule.success.fetching'))
+
+      const splitEvents = splitArray<{ cronjob: string; animeID: string }>(message.customData.events)
+
+      const waitMessage = await sendSuccessEmbed(
+        message,
+        app.t(message.locale, 'command.animeschedule.success.fetching'),
+      )
 
       for (const events of splitEvents) {
-        
         const embed = new app.Embed()
-        .setAuthor(message.author.username, message.author.avatarURL())
+          .setAuthor(message.author.username, message.author.avatarURL())
 
         for (const event of events) {
-          const { data: animeResponse } = await axios.get<Anima.API.GetAnimeByID>(`${Deno.env.get('ANIMA_API')}/anime/${event.animeID}`)
-  
-          if (!animeResponse) { return }
-          embed.addField(`${getLocaleMetadata<Anima.RAW.Anime, Anima.RAW.AnimeMetadata>(animeResponse.data, message.locale)?.title || 'No title'} [${animeResponse.data.id}]`, `\`\`\`ansi\n[30m${event.cronjob}\n[0m${construe.toString(event.cronjob, { locale: localeLookup[message.locale as 'pt-BR' | 'en-US']})}\`\`\``)
+          const { data: animeResponse } = await axios.get<Anima.API.GetAnimeByID>(
+            `${Deno.env.get('ANIMA_API')}/anime/${event.animeID}`,
+          )
+
+          if (!animeResponse) return
+          embed.addField(
+            `${
+              getLocaleMetadata<Anima.RAW.Anime, Anima.RAW.AnimeMetadata>(animeResponse.data, message.locale)?.title ||
+              'No title'
+            } [${animeResponse.data.id}]`,
+            `\`\`\`ansi\n[30m${event.cronjob}\n[0m${
+              construe.toString(event.cronjob, { locale: localeLookup[message.locale as 'pt-BR' | 'en-US'] })
+            }\`\`\``,
+          )
         }
 
         embedList.push(embed)
@@ -91,19 +102,20 @@ export default new app.command.CustomCommand({
         nextButtonStyle: 'PRIMARY',
         previousButtonStyle: 'PRIMARY',
       })
-      
+
       await waitMessage?.delete?.()
     }
-
 
     // User wants to add a new anime to schedule.
     if (message.args['action'] === 'add') {
       if (!message.args['cron'] || !message.args['id']) {
         throw new Error(app.t(message.locale, 'generic.err.command.missingArgument', { command: 'animeschedule' }))
       }
-      
+
       if (previousEvents.find((event) => event.animeID === Number(message.args['id']))) {
-        throw new Error(app.t(message.locale, 'command.animeschedule.err.alreadyScheduled', { anime: message.args['id'] }))
+        throw new Error(
+          app.t(message.locale, 'command.animeschedule.err.alreadyScheduled', { anime: message.args['id'] }),
+        )
       }
       const scheduleModel = new Schedule()
 
@@ -111,13 +123,16 @@ export default new app.command.CustomCommand({
       const cron = message.args['cron'] as string
 
       const animaAnime = await axios.get<Anima.API.GetAnimeByID>(`${Deno.env.get('ANIMA_API')}/anime/${animeID}`)
-      if (!animaAnime.data) { throw new Error('command.animeschedule.err.invalidAnimeID') }
+      if (!animaAnime.data) throw new Error('command.animeschedule.err.invalidAnimeID')
 
-      const animaAnimeMetadata = getLocaleMetadata<Anima.RAW.Anime, Anima.RAW.AnimeMetadata>(animaAnime.data.data, message.locale)
-      
+      const animaAnimeMetadata = getLocaleMetadata<Anima.RAW.Anime, Anima.RAW.AnimeMetadata>(
+        animaAnime.data.data,
+        message.locale,
+      )
+
       scheduleModel.animeID = animeID
       scheduleModel.cronjob = cron
-      
+
       await app.orm.save(scheduleModel)
 
       new Cron(
@@ -130,17 +145,16 @@ export default new app.command.CustomCommand({
           name: `anime-${animeID}`,
         },
         () => {
-          console.info(`Updating anime ${animeID}`)          
+          console.info(`Updating anime ${animeID}`)
           updateAnime(animeID.toString(), 'episode')
-        }
+        },
       )
-      
-      await sendSuccessEmbed(message, 'command.animeschedule.success.added', { 
-        anime: animaAnimeMetadata?.title || 'No title', 
-        cron: construe.toString(cron, { locale: localeLookup[message.locale as 'pt-BR' | 'en-US']}), 
-        rawCron: cron 
-      })
 
+      await sendSuccessEmbed(message, 'command.animeschedule.success.added', {
+        anime: animaAnimeMetadata?.title || 'No title',
+        cron: construe.toString(cron, { locale: localeLookup[message.locale as 'pt-BR' | 'en-US'] }),
+        rawCron: cron,
+      })
     }
 
     // use wants to remove an anime from schedule
@@ -154,21 +168,24 @@ export default new app.command.CustomCommand({
       }
 
       const scheduleModel = app.database.models.get('schedule')
-      if (!scheduleModel) { return }
-      
+      if (!scheduleModel) return
+
       await app.orm.delete(
-        scheduleModel, 
-        { 
+        scheduleModel,
+        {
           where: {
             clause: 'animeID = ?',
-            values: [Number(message.args['id'])]
-          } 
-        }
+            values: [Number(message.args['id'])],
+          },
+        },
       )
 
-      scheduledJobs.find( cron => cron.name === `anime-${message.args['id']}`)?.stop()
+      scheduledJobs.find((cron) => cron.name === `anime-${message.args['id']}`)?.stop()
 
-      await sendSuccessEmbed(message, 'command.animeschedule.success.removed', { anime: message.args['id'], cron: message.args['cron'] })
+      await sendSuccessEmbed(message, 'command.animeschedule.success.removed', {
+        anime: message.args['id'],
+        cron: message.args['cron'],
+      })
     }
-  }
+  },
 })

@@ -5,7 +5,7 @@ export * as event from '@/app/event.ts'
 export * as cronjob from '@/app/cronjob.ts'
 export * as database from '@/app/database.ts'
 export * as interaction from '@/app/interaction.ts'
-export { t, orm, SqlTable } from '@/deps.ts'
+export { orm, SqlTable, t } from '@/deps.ts'
 import * as CoreLogger from '@/app/core/logger.ts'
 
 export const Logger = CoreLogger.default

@@ -2,7 +2,6 @@ import type { Listener } from '@/app/event.ts'
 import { interactionHandlers } from '../namespace/states.native.ts'
 import * as app from '@/app.ts'
 
-
 const event: Listener<'interactionCreate'> = {
   description: 'Listens for interactions with native components (like pagination)',
   execute: async (interaction) => {
@@ -28,10 +27,10 @@ const event: Listener<'interactionCreate'> = {
       const interactionID = (interaction.data as any).custom_id as
         | string
         | undefined
-  
+
       if (interactionID) {
         const interactionHandler = await interactionHandlers.get(interactionID)
-  
+
         if (interactionHandler) {
           await interactionHandler(interaction)
         } else {

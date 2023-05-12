@@ -2,9 +2,9 @@ import * as app from '@/app.ts'
 import { updateAnime } from '@/namespace/cli.ts'
 import axios from 'npm:axios'
 import { isSupportedImage, sendErrorEmbed, sendSuccessEmbed } from '@/namespace/utils.native.ts'
-import { Anima } from "../../../@types/anima.d.ts";
-import { getLocaleMetadata } from "@/namespace/anime.ts";
-import { NormalMessage } from '../../../@types/event.d.ts';
+import { Anima } from '../../../@types/anima.d.ts'
+import { getLocaleMetadata } from '@/namespace/anime.ts'
+import { NormalMessage } from '../../../@types/event.d.ts'
 
 const errorCache = app.cache.ensure('errorreport', 1000 * 60 * 10)
 
@@ -16,10 +16,10 @@ export default new app.command.CustomCommand({
   category: 'category.anima',
   positionalArgs: [
     {
-      name: 'error',	
+      name: 'error',
       description: 'command.reportError.args.error',
-      required: true
-    }
+      required: true,
+    },
   ],
   // Nonregistered users: 60 minutes
   coolDown: 60 * 60,
@@ -27,16 +27,16 @@ export default new app.command.CustomCommand({
   roleCoolDown: [
     {
       coolDown: 60 * 10,
-      role: 'anima user'
+      role: 'anima user',
     },
     {
       coolDown: 0,
-      role: 'staff'
+      role: 'staff',
     },
     {
       coolDown: 60 * 2,
-      role: 'mod'
-    }
+      role: 'mod',
+    },
   ],
   beforeExecute: async (message) => {
     message.customData = {}
@@ -44,7 +44,7 @@ export default new app.command.CustomCommand({
     const error = message.positionalArgs['error'] as string
 
     if (!error) {
-      await message.reactions.removeAll();
+      await message.reactions.removeAll()
       await message.addReaction('<:bot_fail:1077894898331697162>')
       await sendErrorEmbed(message, 'command.reporterror.err.noError')
       throw new Error('command.reportError.err.noError')
@@ -59,9 +59,13 @@ export default new app.command.CustomCommand({
     const errorType = message.content.split(' ')[0]?.replace('.', '')
 
     try {
-      const animeResponse = await axios.get<Anima.API.GetAnimeByID>(`https://api.anima.moe/anime/${errorObject.animeId}`)
+      const animeResponse = await axios.get<Anima.API.GetAnimeByID>(
+        `https://api.anima.moe/anime/${errorObject.animeId}`,
+      )
       const anime = animeResponse.data.data
-      message.customData.statusMessage = await sendSuccessEmbed(message, 'command.reportError.state.start', { anime: getLocaleMetadata<Anima.RAW.Anime, Anima.RAW.AnimeMetadata>(anime, message.locale)?.title || 'Unknown'})
+      message.customData.statusMessage = await sendSuccessEmbed(message, 'command.reportError.state.start', {
+        anime: getLocaleMetadata<Anima.RAW.Anime, Anima.RAW.AnimeMetadata>(anime, message.locale)?.title || 'Unknown',
+      })
     } catch (_e) {
       message.customData.statusMessage?.delete?.()
       throw new Error('command.reportError.err.invalidAnime')
@@ -79,21 +83,27 @@ export default new app.command.CustomCommand({
     if (!errorObject.error_type || !errorObject.animeId) {
       throw new Error('command.reportError.err.invalidError')
     }
-  
+
     const errorLookup = {
       'errmeta': 'metadata',
       'err': 'all',
-      'errep': 'episode'
+      'errep': 'episode',
     }
-    
+
     const stateMessage = message.customData.statusMessage as NormalMessage
 
     try {
-      message.customData.result = await updateAnime(errorObject.animeId, errorLookup[errorType || 'all'], message.locale)
+      message.customData.result = await updateAnime(
+        errorObject.animeId,
+        errorLookup[errorType || 'all'],
+        message.locale,
+      )
 
-      const animeResponse = await axios.get<Anima.API.GetAnimeByID>(`https://api.anima.moe/anime/${errorObject.animeId}`)
+      const animeResponse = await axios.get<Anima.API.GetAnimeByID>(
+        `https://api.anima.moe/anime/${errorObject.animeId}`,
+      )
       const anime = animeResponse.data.data
-  
+
       const animeMetadata = getLocaleMetadata<Anima.RAW.Anime, Anima.RAW.AnimeMetadata>(anime, message.locale)
       const animeEmbed = new app.Embed()
       if (isSupportedImage(anime.background)) {
@@ -105,39 +115,49 @@ export default new app.command.CustomCommand({
         embeds: [
           animeEmbed
             .setAuthor(animeMetadata?.title || 'Missing Title')
-            .setDescription(`\`\`\`${getLocaleMetadata<Anima.RAW.Anime, Anima.RAW.AnimeMetadata>(anime, message.locale)?.synopsis || 'Missing Synopsis'}\`\`\``)
+            .setDescription(
+              `\`\`\`${
+                getLocaleMetadata<Anima.RAW.Anime, Anima.RAW.AnimeMetadata>(anime, message.locale)?.synopsis ||
+                'Missing Synopsis'
+              }\`\`\``,
+            )
             .addField({
               name: app.t(message.locale, 'command.animeupdate.embed.categories'),
-              value: `\`\`\`${anime.Category?.map( cat => getLocaleMetadata<Anima.RAW.Category, Anima.RAW.CategoryMetadata>(cat, message.locale)?.title || cat.slug ).join(', ')}\`\`\``
+              value: `\`\`\`${
+                anime.Category?.map((cat) =>
+                  getLocaleMetadata<Anima.RAW.Category, Anima.RAW.CategoryMetadata>(cat, message.locale)?.title ||
+                  cat.slug
+                ).join(', ')
+              }\`\`\``,
             })
             .addField({
               name: app.t(message.locale, 'command.animeupdate.embed.episodes'),
-              value: `\`\`\`${(Number(message?.customData?.result?.finishedTasks || 0) + Number(message?.customData?.result?.failedTasks || 0)).toString()}\`\`\``,
-              inline: true
+              value: `\`\`\`${
+                (Number(message?.customData?.result?.finishedTasks || 0) +
+                  Number(message?.customData?.result?.failedTasks || 0)).toString()
+              }\`\`\``,
+              inline: true,
             })
             .addField({
               name: app.t(message.locale, 'command.animeupdate.embed.succeededEpisodes'),
               value: `\`\`\`${(Number(message?.customData?.result?.finishedTasks || 0)).toString()}\`\`\``,
-              inline: true
+              inline: true,
             })
             .addField({
               name: app.t(message.locale, 'command.animeupdate.embed.failedEpisodes'),
               value: `\`\`\`${(Number(message?.customData?.result?.failedTasks || 0)).toString()}\`\`\``,
-              inline: true
+              inline: true,
             })
-            .setFooter(`${message.author.username}`, message.author.avatarURL())
-        ]
+            .setFooter(`${message.author.username}`, message.author.avatarURL()),
+        ],
       })
     } catch (e) {
       await sendErrorEmbed(message, 'command.animeupdate.err.fail')
       stateMessage?.delete?.()
       console.log(e)
     }
-
-
-
   },
   afterExecute: (message) => {
     errorCache.set(message.customData.error.animeId, true, 1000 * 60 * 10)
-  }
+  },
 })

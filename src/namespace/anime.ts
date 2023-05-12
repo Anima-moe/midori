@@ -1,4 +1,4 @@
-import { Anima } from "../../@types/anima.d.ts";
+import { Anima } from '../../@types/anima.d.ts'
 
 export type AnimaMediaMetadata = {
   [key: string]: Anima.RAW.AnimeMetadata

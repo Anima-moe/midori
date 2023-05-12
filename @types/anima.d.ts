@@ -217,7 +217,9 @@ export namespace Anima {
     type GetUserPlayerHead = DefaultResponse<Anima.RAW.UserPlayerHead> // Returns Error if user not found or episode not found
 
     type GetUserComments = DefaultResponse<
-      Anima.RAW.Comment & { AnimeEpisode: Anima.RAW.Episode & { AnimeSeason: Anima.RAW.Season & { Anime: Anima.RAW.Anime } } }
+      Anima.RAW.Comment & {
+        AnimeEpisode: Anima.RAW.Episode & { AnimeSeason: Anima.RAW.Season & { Anime: Anima.RAW.Anime } }
+      }
     >
 
     type GetEpisodeMedia = {
@@ -261,5 +263,4 @@ export namespace Anima {
 
     type GetUserFavorites = DefaultResponse<Anima.RAW.Anime>
   }
-
 }

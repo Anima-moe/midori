@@ -11,8 +11,8 @@ export default new app.command.CustomCommand({
     {
       name: 'amount',
       description: 'command.clear.args.amount',
-      required: true
-    }
+      required: true,
+    },
   ],
   execute: async (message) => {
     const channel = message.channel as app.GuildTextChannel
@@ -29,20 +29,20 @@ export default new app.command.CustomCommand({
       await message.addReaction(':bot_fail:1077894898331697162')
       return
     }
-    
+
     try {
-      await channel.bulkDelete(Number(amount) + 1);
+      await channel.bulkDelete(Number(amount) + 1)
       await sendSuccessEmbed(message, 'command.clear.success', { amount: amount + 1 })
     } catch (e) {
       console.log(e)
       message.send({
         embeds: [
           new app.Embed()
-          .setColor('RED')
-          .setDescription(app.t(message.locale, 'command.clear.err.unknown'))
-          .setImage('https://media.tenor.com/FJsjk_9b_XgAAAAC/anime-hit.gif')
+            .setColor('RED')
+            .setDescription(app.t(message.locale, 'command.clear.err.unknown'))
+            .setImage('https://media.tenor.com/FJsjk_9b_XgAAAAC/anime-hit.gif'),
         ],
       })
     }
-  }
+  },
 })

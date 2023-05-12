@@ -194,7 +194,7 @@ export async function sendPaginatedEmbed(
   )
 
   embeds[0]
-  .setFooter('1 / ' + embeds.length)
+    .setFooter('1 / ' + embeds.length)
 
   await message.send({
     content: options?.content ? app.t(message.locale, options.content) : undefined,

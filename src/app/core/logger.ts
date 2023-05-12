@@ -40,7 +40,7 @@ export default class Logger {
     if (message instanceof Error) {
       return message.stack
     }
-    
+
     if (Array.isArray(message)) {
       return JSON.stringify(
         {

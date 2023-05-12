@@ -2,9 +2,9 @@ import * as app from '@/app.ts'
 import { updateAnime } from '@/namespace/cli.ts'
 import axios from 'npm:axios'
 import { isSupportedImage, safeSendMessage, sendErrorEmbed, sendSuccessEmbed } from '@/namespace/utils.native.ts'
-import { Anima } from "../../../@types/anima.d.ts";
-import { getLocaleMetadata } from "@/namespace/anime.ts";
-import { NormalMessage } from '../../../@types/event.d.ts';
+import { Anima } from '../../../@types/anima.d.ts'
+import { getLocaleMetadata } from '@/namespace/anime.ts'
+import { NormalMessage } from '../../../@types/event.d.ts'
 
 export default new app.command.CustomCommand({
   name: 'animeupdate',
@@ -14,7 +14,7 @@ export default new app.command.CustomCommand({
   category: 'category.anima',
   positionalArgs: [
     {
-      name: 'identifier',	
+      name: 'identifier',
       description: 'command.command.animeupdate.description',
       required: true,
       validate: (value: string) => {
@@ -23,13 +23,13 @@ export default new app.command.CustomCommand({
         }
 
         return true
-      }
-    }
+      },
+    },
   ],
   allowedRoles: ['staff', 'mod', 'helping hands'],
   beforeExecute: async (message) => {
     message.customData = {
-      stateMessage: await sendSuccessEmbed(message, 'command.animeupdate.state.start')
+      stateMessage: await sendSuccessEmbed(message, 'command.animeupdate.state.start'),
     }
   },
   execute: async (message) => {
@@ -44,13 +44,12 @@ export default new app.command.CustomCommand({
     const stateMessage = message.customData.stateMessage as NormalMessage
 
     if (!message.customData.result) {
-      await stateMessage.delete()  
+      await stateMessage.delete()
       await message.reactions.removeAll()
       await message.addReaction('1077894898331697162')
       safeSendMessage(message, 'command.animeupdate.err.fail')
       return
     }
-
 
     const animeID = message.customData.result.anime
 
@@ -60,7 +59,7 @@ export default new app.command.CustomCommand({
     }
 
     const { data: response } = await axios.get(`/anime/${animeID}`, {
-      baseURL: Deno.env.get('ANIMA_API')
+      baseURL: Deno.env.get('ANIMA_API'),
     }) as { data: { data: Anima.RAW.Anime } }
     const anime = response.data
 
@@ -74,34 +73,50 @@ export default new app.command.CustomCommand({
       await stateMessage.edit({
         embeds: [
           animeEmbed
-            .setAuthor(getLocaleMetadata<Anima.RAW.Anime, Anima.RAW.AnimeMetadata>(anime, message.locale)?.title || 'Missing Title', 'https://emoji.discadia.com/emojis/209cd994-3a93-4812-8b6e-be6d8d07708f.GIF')
-            .setDescription(`\`\`\`${getLocaleMetadata<Anima.RAW.Anime, Anima.RAW.AnimeMetadata>(anime, message.locale)?.synopsis || 'Missing Synopsis'}\`\`\``)
+            .setAuthor(
+              getLocaleMetadata<Anima.RAW.Anime, Anima.RAW.AnimeMetadata>(anime, message.locale)?.title ||
+                'Missing Title',
+              'https://emoji.discadia.com/emojis/209cd994-3a93-4812-8b6e-be6d8d07708f.GIF',
+            )
+            .setDescription(
+              `\`\`\`${
+                getLocaleMetadata<Anima.RAW.Anime, Anima.RAW.AnimeMetadata>(anime, message.locale)?.synopsis ||
+                'Missing Synopsis'
+              }\`\`\``,
+            )
             .addField({
               name: app.t(message.locale, 'command.animeupdate.embed.categories'),
-              value: `\`\`\`${anime.Category?.map( cat => getLocaleMetadata<Anima.RAW.Category, Anima.RAW.CategoryMetadata>(cat, message.locale)?.title || cat.slug ).join(', ')}\`\`\``
+              value: `\`\`\`${
+                anime.Category?.map((cat) =>
+                  getLocaleMetadata<Anima.RAW.Category, Anima.RAW.CategoryMetadata>(cat, message.locale)?.title ||
+                  cat.slug
+                ).join(', ')
+              }\`\`\``,
             })
             .addField({
               name: app.t(message.locale, 'command.animeupdate.embed.episodes'),
-              value: `\`\`\`${(Number(message?.customData?.result?.finishedTasks || 0) + Number(message?.customData?.result?.failedTasks || 0)).toString()}\`\`\``,
-              inline: true
+              value: `\`\`\`${
+                (Number(message?.customData?.result?.finishedTasks || 0) +
+                  Number(message?.customData?.result?.failedTasks || 0)).toString()
+              }\`\`\``,
+              inline: true,
             })
             .addField({
               name: app.t(message.locale, 'command.animeupdate.embed.succeededEpisodes'),
               value: `\`\`\`${(Number(message?.customData?.result?.finishedTasks || 0)).toString()}\`\`\``,
-              inline: true
+              inline: true,
             })
             .addField({
               name: app.t(message.locale, 'command.animeupdate.embed.failedEpisodes'),
               value: `\`\`\`${(Number(message?.customData?.result?.failedTasks || 0)).toString()}\`\`\``,
-              inline: true
+              inline: true,
             })
-            .setFooter(`${message.author.username}`, message.author.avatarURL())
-        ]
+            .setFooter(`${message.author.username}`, message.author.avatarURL()),
+        ],
       })
     } catch (e) {
       sendErrorEmbed(message, 'command.animeupdate.err.fail')
       console.log(e)
     }
-
-  }
+  },
 })
