@@ -114,7 +114,8 @@ export async function safeSendMessage(
     return await message.channel.send(
       app.t(message.locale, content || 'generic.succ.command', args),
     )
-  } catch {
+  } catch (e) {
+    console.error(e)
     await sendErrorEmbed(message, content || 'generic.err.command.unknown')
   }
 }
@@ -125,7 +126,7 @@ export async function safeRemoveReactions(
   try {
     await message.reactions.removeAll()
   } catch {
-    return await sendErrorEmbed(message, 'generic.err.command.unknown')
+    return
   }
 }
 
@@ -136,7 +137,7 @@ export async function safeAddReaction(
   try {
     await message.addReaction(emoji)
   } catch {
-    return await sendErrorEmbed(message, 'generic.err.command.unknown')
+    return
   }
 }
 

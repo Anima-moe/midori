@@ -32,19 +32,17 @@ export default new app.command.CustomCommand({
     
     try {
       await channel.bulkDelete(Number(amount) + 1);
-      const log = await sendSuccessEmbed(message, 'command.clear.success')
-      setInterval(log?.delete, 1000 * 10)
-
+      await sendSuccessEmbed(message, 'command.clear.success')
     } catch (e) {
       console.log(e)
-      // message.send({
-      //   embeds: [
-      //     new app.Embed()
-      //     .setColor('RED')
-      //     .setDescription(app.t(message.locale, 'command.clear.err.unknown'))
-      //     .setImage('https://media.tenor.com/FJsjk_9b_XgAAAAC/anime-hit.gif')
-      //   ],
-      // })
+      message.send({
+        embeds: [
+          new app.Embed()
+          .setColor('RED')
+          .setDescription(app.t(message.locale, 'command.clear.err.unknown'))
+          .setImage('https://media.tenor.com/FJsjk_9b_XgAAAAC/anime-hit.gif')
+        ],
+      })
     }
   }
 })

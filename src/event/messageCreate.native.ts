@@ -289,6 +289,7 @@ const event: app.event.Listener<'messageCreate'> = {
       message.positionalArgs = positionalObject
       message.args = argsObject
     } catch (e) {
+      console.error(e)
       await safeRemoveReactions(message)
       await safeAddReaction(message, ':bot_fail:1077894898331697162')
       return await sendErrorEmbed(
@@ -326,6 +327,7 @@ const event: app.event.Listener<'messageCreate'> = {
         }
       }
     } catch (_e) {
+      console.log(_e)
       await safeRemoveReactions(message)
       await safeAddReaction(message, '1077894898331697162')
       return await sendErrorEmbed(message, 'generic.err.command.coolDown')
@@ -342,9 +344,11 @@ const event: app.event.Listener<'messageCreate'> = {
           await cmd.options.afterExecute?.bind(cmd)(message)
         })
         ?.catch((e) => {
+          console.error(e)
           cmd.options.onError?.bind(cmd)(message, e)
         })
     } catch (e) {
+      console.error(e)
       await safeRemoveReactions(message)
       await safeAddReaction(message, ':bot_fail:1077894898331697162')
       return await sendErrorEmbed(
