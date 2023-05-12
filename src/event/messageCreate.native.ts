@@ -17,7 +17,7 @@ import { NormalMessage } from '../../@types/event.d.ts'
 
 const logger = new Logger({
   logLevel: Deno.env.get('LOG_LEVEL') as any || 'debug',
-  prefix: 'CommandHandler',
+  prefix: 'CmdHandler',
 })
 
 function resolveRoleCoolDown(
@@ -88,9 +88,9 @@ const event: app.event.Listener<'messageCreate'> = {
       }
     } catch (e) {
       logger.error(
-        `Error while handling command ${crayon.lightCyan('messageCreate.native')} execution`,
+        `Iternal Error while handling command ${crayon.lightCyan('messageCreate.native')} extra properties`,
       )
-      console.error(e)
+      logger.error(e)
       await safeRemoveReactions(message)
       await safeAddReaction(message, '1077894898331697162')
       return await sendErrorEmbed(message, 'generic.err.command.unknown')
@@ -138,7 +138,7 @@ const event: app.event.Listener<'messageCreate'> = {
       }
     } catch (e) {
       logger.error(
-        `Error while handling command ${crayon.lightCyan('messageCreate.native')} execution`,
+        `Error while handling command ${crayon.lightCyan('messageCreate.native')} permissions`,
       )
       console.error(e)
       await safeRemoveReactions(message)
@@ -162,7 +162,7 @@ const event: app.event.Listener<'messageCreate'> = {
       }
     } catch (e) {
       logger.error(
-        `Error while handling command ${crayon.lightCyan('messageCreate.native')} execution`,
+        `Error while handling command ${crayon.lightCyan('messageCreate.native')} roles`,
       )
       console.error(e)
       await safeRemoveReactions(message)
@@ -289,7 +289,10 @@ const event: app.event.Listener<'messageCreate'> = {
       message.positionalArgs = positionalObject
       message.args = argsObject
     } catch (e) {
-      console.error(e)
+      logger.error(
+        `Error while handling command ${crayon.lightCyan('messageCreate.native')} arguments`,
+      )
+      logger.error(e)
       await safeRemoveReactions(message)
       await safeAddReaction(message, ':bot_fail:1077894898331697162')
       return await sendErrorEmbed(
@@ -326,8 +329,11 @@ const event: app.event.Listener<'messageCreate'> = {
           throw new Error(`error.command.coolDown`)
         }
       }
-    } catch (_e) {
-      console.log(_e)
+    } catch (e) {
+      logger.error(
+        `Error while handling command ${crayon.lightCyan('messageCreate.native')} cooldown`,
+      )
+      logger.error(e)
       await safeRemoveReactions(message)
       await safeAddReaction(message, '1077894898331697162')
       return await sendErrorEmbed(message, 'generic.err.command.coolDown')
@@ -343,12 +349,26 @@ const event: app.event.Listener<'messageCreate'> = {
           await safeAddReaction(message, 'a:bot_loaded:1077896425570046044')
           await cmd.options.afterExecute?.bind(cmd)(message)
         })
-        ?.catch((e) => {
-          console.error(e)
-          cmd.options.onError?.bind(cmd)(message, e)
+        ?.catch(async (e) => {
+          logger.error(
+            `Error while handling command ${crayon.lightCyan('messageCreate.native')} bindedExecution`,
+          )
+          logger.error(e)
+          await message?.reactions?.removeAll()
+          await safeAddReaction(message, ':bot_fail:1077894898331697162')
+          await sendErrorEmbed(
+            message,
+            t(message.locale, e.message, {
+              command: `${prefix}${cmd.options.name}`,
+            }),
+          )
+          await cmd.options.onError?.bind(cmd)(message, e)
         })
     } catch (e) {
-      console.error(e)
+      logger.error(
+        `Error while handling command ${crayon.lightCyan('messageCreate.native')} beforeExecution`,
+      )
+      logger.error(e)
       await safeRemoveReactions(message)
       await safeAddReaction(message, ':bot_fail:1077894898331697162')
       return await sendErrorEmbed(

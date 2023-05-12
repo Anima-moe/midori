@@ -37,6 +37,10 @@ export default class Logger {
   }
 
   private _parseMessage(message: any) {
+    if (message instanceof Error) {
+      return message.stack
+    }
+    
     if (Array.isArray(message)) {
       return JSON.stringify(
         {
