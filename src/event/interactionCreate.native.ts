@@ -1,7 +1,7 @@
 import type { Listener } from '@/app/event.ts'
 import { interactionHandlers } from '../namespace/states.native.ts'
-import { client } from '@/app/client.ts'
 import * as app from '@/app.ts'
+
 
 const event: Listener<'interactionCreate'> = {
   description: 'Listens for interactions with native components (like pagination)',
@@ -13,7 +13,7 @@ const event: Listener<'interactionCreate'> = {
     try {
       const guildChannel = message?.channel as app.GuildTextChannel
       const guildID = guildChannel?.guildID
-      const guild = await client.guilds.get(guildID)
+      const guild = await app.client.guilds.get(guildID)
       const guildMember = await guild?.members.get(interaction.user.id)
 
       const userLocale = (await guildMember?.roles.array())?.find((role) => role.name.startsWith('lang:'))?.name
