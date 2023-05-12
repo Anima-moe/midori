@@ -1,9 +1,10 @@
 import * as app from '@/app.ts'
-import { Cron, scheduledJobs, t } from "@/deps.ts";
+import { Cron, scheduledJobs } from "@/deps.ts";
 
 import { getLocaleMetadata } from '@/namespace/anime.ts'
-import { sendSuccessEmbed } from '@/namespace/utils.native.ts'
+import { sendPaginatedEmbed, sendSuccessEmbed } from '@/namespace/utils.native.ts'
 import { updateAnime } from "@/namespace/cli.ts";
+import { splitArray } from '@/namespace/utils.ts';
 
 import Schedule from '@/model/schedules.ts'
 
@@ -64,20 +65,34 @@ export default new app.command.CustomCommand({
     // User provided no arguments
     // Show all schedules
     if (!message.args['action']) {
-      const embed = new app.Embed()
-      .setFooter(message.author.username, message.author.avatarURL())
+
+      const embedList: app.Embed[] = []
       
-      for (const event of message.customData.events) {
-        const { data: animeResponse } = await axios.get<Anima.API.GetAnimeByID>(`${Deno.env.get('ANIMA_API')}/anime/${event.animeID}`)
+      const splitEvents = splitArray<{ cronjob: string, animeID: string }>(message.customData.events)
+      
+      const waitMessage = await sendSuccessEmbed(message, app.t(message.locale, 'command.animeschedule.success.fetching'))
 
-        if (!animeResponse) { continue }
+      for (const events of splitEvents) {
+        
+        const embed = new app.Embed()
+        .setAuthor(message.author.username, message.author.avatarURL())
 
-        embed.addField(`${getLocaleMetadata<Anima.RAW.Anime, Anima.RAW.AnimeMetadata>(animeResponse.data, message.locale)?.title || 'No title'} [${animeResponse.data.id}]`, `\`\`\`ansi\n[30m${event.cronjob}\n[0m${construe.toString(event.cronjob, { locale: localeLookup[message.locale as 'pt-BR' | 'en-US']})}\`\`\``)
+        for (const event of events) {
+          const { data: animeResponse } = await axios.get<Anima.API.GetAnimeByID>(`${Deno.env.get('ANIMA_API')}/anime/${event.animeID}`)
+  
+          if (!animeResponse) { return }
+          embed.addField(`${getLocaleMetadata<Anima.RAW.Anime, Anima.RAW.AnimeMetadata>(animeResponse.data, message.locale)?.title || 'No title'} [${animeResponse.data.id}]`, `\`\`\`ansi\n[30m${event.cronjob}\n[0m${construe.toString(event.cronjob, { locale: localeLookup[message.locale as 'pt-BR' | 'en-US']})}\`\`\``)
+        }
+
+        embedList.push(embed)
       }
 
-      message.reply({
-        embeds: [embed]
+      await sendPaginatedEmbed(message, embedList, {
+        nextButtonStyle: 'PRIMARY',
+        previousButtonStyle: 'PRIMARY',
       })
+      
+      await waitMessage?.delete?.()
     }
 
 

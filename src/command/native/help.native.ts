@@ -1,13 +1,8 @@
 import * as app from '@/app.ts'
-import { sendPaginatedEmbed } from '../../namespace/utils.native.ts';
+import { sendPaginatedEmbed } from '@/namespace/utils.native.ts';
+import { splitArray } from "@/namespace/utils.ts";
 
-function splitArray<T>(arr: T[]): T[][] {
-  const result: T[][] = [];
-  for (let i = 0; i < arr.length; i += 4) {
-    result.push(arr.slice(i, i + 4));
-  }
-  return result;
-}
+
 
 export default new app.command.CustomCommand({
   name: 'help',

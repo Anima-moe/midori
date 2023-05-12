@@ -160,6 +160,7 @@ export default {
       success: {
         added: 'Tarefa agendada com sucesso!\nAnime: {anime}.\nCron: {cron} ({rawCron})',
         removed: 'Tarefa removida com sucesso!\nAnime: {anime}.\nCron: {cron} ({rawCron})',
+        fetching: 'Buscando informação dos animes agendados, isso pode demorar alguns segundos.'
       }
     }
   },
