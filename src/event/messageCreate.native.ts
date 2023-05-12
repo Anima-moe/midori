@@ -233,12 +233,14 @@ const event: app.event.Listener<'messageCreate'> = {
           )
           .addField(
             '⏳ ' + t(message.locale, 'command.help.cooldown'),
-            `\`\`\`${cmd.options.coolDown ? cmd.options.coolDown / 1000 + 's' : '--'}${
+            `\`\`\`ahk
+@Everyone: ${cmd.options.coolDown ? dayjs.duration(cmd.options.coolDown * 1000).asMinutes() + 'min' : '--'}${
               cmd.options?.roleCoolDown
                 ? '\n' +
-                  cmd.options.roleCoolDown.map((role) => `${role.role}: ${role.coolDown * 1000}s`).join('\n')
+                  cmd.options.roleCoolDown.map((role) => `@${role.role}: ${dayjs.duration(role.coolDown * 1000).asMinutes()}min`).join('\n')
                 : ''
-            }\`\`\``,
+            }
+            \`\`\``,
             true,
           )
           .addField(
