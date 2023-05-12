@@ -1,4 +1,4 @@
-import { dayjs } from '@/deps.ts'
+import dayjs from 'npm:dayjs' // TODO: This must change... urgently
 import * as app from '@/app.ts'
 
 export type interactionHandler = (interaction: app.Interaction) => Promise<void>
