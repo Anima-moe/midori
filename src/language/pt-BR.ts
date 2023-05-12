@@ -26,6 +26,7 @@ export default {
     help: {
       defaultArgument: 'Exibe esta mensagem de ajuda.',
       arguments: 'Argumentos',
+      positionalArguments: 'Argumentos posicionais',
       permissions: 'Permissões necessárias',
       roles: 'Cargos permitidos',
       aliases: 'Sinônimos',
@@ -94,8 +95,53 @@ export default {
     },
     animeupdate: {
       description: 'Identifica a fonte, busca e atualiza informações de um anime no Anima.',
-      usage: 'https://animeprovider.tld/anime/path',
+      usage: 'https://animeprovider.tld/anime/path ou 1',
+      args: {
+        anime: 'Link para o anime na source ou ID do anime no Anima.',
+      },
+      err: {
+        invalidAnime: 'Anime inválido. Verifique se o link está correto ou se o ID é válido.',
+        fail: 'Falha ao atualizar anime.',
+        failToFetch: 'Falha ao obter dados do anime atualizado.'
+      },
+      state: {
+        start: 'Atualizando anime.',
+        succeeded: 'Episódios processados com sucesso: {succeeded}',
+        failed: 'Episódios não processados: {failed}',
+      },
+      embed: {
+        categories: 'Gêneros',
+        episodes: 'Processados',
+        failedEpisodes: 'Ignorados',
+        succeededEpisodes: 'Atualizados',
+      }
     },
+    reportError: {
+      description: 'Reporta um erro para a midori e sinaliza os desenvolvedores.',
+      usage: 'dW0gZXhlbXBsbyBkZSBlcnJvIGFxdWksIHPDsyBwcmEgcG9yIG5vIHVzYWdlcw==',
+      args: {
+        error: 'Código de erro gerado pelas aplicações do Anima.'
+      },
+      err: {
+        noError: 'Não consegui identificar o erro reportado',
+        alreadyReported: 'Este anime já foi reportado nos últimos 10 minutos.',
+        invalidAnime: 'Anime inválido. Verifique se o link está correto ou se o ID é válido.',
+      },
+      state: {
+        start: 'Erro identificado, buscando recusos para anime:\n{anime}'
+      }
+    },
+    clear: {
+      description: 'Limpa mensagens do chat.',
+      usage: '10',
+      args: {
+        amount: 'Quantidade de mensagens a serem apagadas.',
+      },
+      err: {
+        invalidAmount: 'Quantidade inválida. O valor deve ser um número inteiro entre 1 e 100.',
+        unknown: 'Erro desconhecido ao tentar apagar mensagens.\n\nObs: o discord não permite apagar mensagens com mais de 14 dias de existência.',
+      }
+    }
   },
   category: {
     generic: '📦 Genérico',
