@@ -1,6 +1,5 @@
 import * as app from '@/app.ts'
-import { sendErrorEmbed, sendSuccessEmbed } from '../../namespace/utils.native.ts';
-import { NormalMessage } from "../../../@types/event.d.ts";
+import { sendErrorEmbed, sendSuccessEmbed } from '../../namespace/utils.native.ts'
 
 export default new app.command.CustomCommand({
   name: 'clear',
@@ -16,7 +15,7 @@ export default new app.command.CustomCommand({
     }
   ],
   execute: async (message) => {
-    const channel = message.channel as app.GuildTextChannel & NormalMessage
+    const channel = message.channel as app.GuildTextChannel
 
     if (channel.type !== 0) {
       return
@@ -38,14 +37,14 @@ export default new app.command.CustomCommand({
 
     } catch (e) {
       console.log(e)
-      message.send({
-        embeds: [
-          new app.Embed()
-          .setColor('RED')
-          .setDescription(app.t(message.locale, 'command.command.clear.err.unknown'))
-          .setImage('https://media.tenor.com/FJsjk_9b_XgAAAAC/anime-hit.gif')
-        ],
-      })
+      // message.send({
+      //   embeds: [
+      //     new app.Embed()
+      //     .setColor('RED')
+      //     .setDescription(app.t(message.locale, 'command.clear.err.unknown'))
+      //     .setImage('https://media.tenor.com/FJsjk_9b_XgAAAAC/anime-hit.gif')
+      //   ],
+      // })
     }
   }
 })
