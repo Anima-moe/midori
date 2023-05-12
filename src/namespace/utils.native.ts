@@ -223,3 +223,10 @@ export async function sendPaginatedEmbed(
     }],
   })
 }
+
+export function isSupportedImage(path: string) {
+  console.log(path)
+  const supportedExtensions = ['png', 'jpg', 'jpe', 'jpeg', 'gif', 'webp']
+  const extension = path.split('.').pop()
+  return supportedExtensions.includes(extension!)
+}
