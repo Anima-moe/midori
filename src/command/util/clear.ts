@@ -32,7 +32,7 @@ export default new app.command.CustomCommand({
     
     try {
       await channel.bulkDelete(Number(amount) + 1);
-      await sendSuccessEmbed(message, 'command.clear.success')
+      await sendSuccessEmbed(message, 'command.clear.success', { amount: amount + 1 })
     } catch (e) {
       console.log(e)
       message.send({
