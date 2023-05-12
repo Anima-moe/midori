@@ -140,6 +140,26 @@ export default {
       err: {
         invalidAmount: 'Quantidade inválida. O valor deve ser um número inteiro entre 1 e 100.',
         unknown: 'Erro desconhecido ao tentar apagar mensagens.\n\nObs: o discord não permite apagar mensagens com mais de 14 dias de existência.',
+      },
+      success: '🗑️ {amount} mensagens apagadas com sucesso.',
+    },
+    animeschedule: {
+      description: 'Gerencia lista de tarefas agendadas para atualização de animes.',
+      longDescription: 'Adiciona, remove ou lista tarefas agendadas para atualização de animes.',
+      usage: '-a add -c "0 0 * * 0" -i 1',
+      args: {
+        action: 'Ação a ser realizada na tarefa.\n;Ações disponíveis: "add", "remove"\n;Ao não providenciar nenhum argumento, uma agenda será exibida.',
+        id: 'Anima AnimeID.\n;[necessário apenas para as ações "add" e "remove"]',
+        cron: 'Cron de agendamento da tarefa.\n;[necessário apenas para a ação "add"]',
+      },
+      err: {
+        noModel: 'Não foi possível encontrar o banco de agendamentos.',
+        alreadyScheduled: 'Tarefa já agendada para o anime {anime}.',
+        notScheduled: 'Nenhuma tarefa encontrada para anime com este ID.',
+      },
+      success: {
+        added: 'Tarefa agendada com sucesso!\nAnime: {anime}.\nCron: {cron} ({rawCron})',
+        removed: 'Tarefa removida com sucesso!\nAnime: {anime}.\nCron: {cron} ({rawCron})',
       }
     }
   },

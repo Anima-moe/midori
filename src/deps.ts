@@ -9,7 +9,7 @@ import parser from 'https://deno.land/x/yargs_parser@yargs-parser-v21.1.1-deno/d
 import { Cache } from 'https://deno.land/x/local_cache@1.0/mod.ts'
 import * as stringSimilarity from 'https://deno.land/x/string_similarity@v1.0.1/mod.ts'
 import { initTranslation, load, Translations } from 'https://deno.land/x/t_i18n@2.1.0/mod.ts'
-import { Cron } from 'https://deno.land/x/croner@6.0.3/dist/croner.js'
+import { Cron, scheduledJobs } from 'https://deno.land/x/croner@6.0.3/dist/croner.js'
 
 import ptBR from '@/language/pt-BR.ts'
 const translator = initTranslation<typeof ptBR>()
@@ -27,4 +27,4 @@ load('pt-BR', ptBR)
 dayjs.extend(relativeTime)
 dayjs.extend(duration)
 
-export { Cache, crayon, Cron, dayjs, harmony, initTranslation, orm, parser as argParser, SqlTable, stringSimilarity, t }
+export { Cache, crayon, Cron, dayjs, harmony, initTranslation, orm, parser as argParser, SqlTable, stringSimilarity, t, scheduledJobs }
