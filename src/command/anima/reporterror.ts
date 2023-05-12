@@ -106,7 +106,7 @@ export default new app.command.CustomCommand({
 
       const animeMetadata = getLocaleMetadata<Anima.RAW.Anime, Anima.RAW.AnimeMetadata>(anime, message.locale)
       const animeEmbed = new app.Embed()
-      if (isSupportedImage(anime.background)) {
+      if (anime.background && isSupportedImage(anime.background)) {
         animeEmbed.setImage(anime.background)
       } else {
         animeEmbed.setThumbnail(anime.cover)
