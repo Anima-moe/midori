@@ -70,22 +70,22 @@ export default class Logger {
 
     if (level === 1) {
       return crayon.cyan(this.options.prefix + spaces) +
-        crayon.lightBlack(' > ')
+        crayon.lightBlack(' › ')
     }
     if (level === 2) {
       return crayon.rgb(226, 135, 67)(this.options.prefix + spaces) +
-        crayon.lightBlack(' > ')
+        crayon.lightBlack(' › ')
     }
     if (level === 3) {
       return crayon.lightRed(this.options.prefix + spaces) +
-        crayon.lightBlack(' > ')
+        crayon.lightBlack(' › ')
     }
     if (level === 4) {
       return crayon.green(this.options.prefix + spaces) +
-        crayon.lightBlack(' > ')
+        crayon.lightBlack(' › ')
     }
 
-    return crayon.bgLightCyan(this.options.prefix)
+    return crayon.lightCyan(this.options.prefix + spaces) + crayon.lightCyan(' ► ')
   }
   private _message(message: string) {
     return this._parseMessage(message)
