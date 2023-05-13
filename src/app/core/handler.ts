@@ -1,5 +1,6 @@
 import { BaseEventNames, EventEmitter } from '@/app/core/listener.ts'
 import * as path from 'std/path'
+import { crayon } from "../../deps.ts";
 
 export interface HandlerEvents extends BaseEventNames {
   load: [path: string]
@@ -34,6 +35,15 @@ export class Handler<Element> extends EventEmitter<HandlerEvents> {
     this.elements.clear()
 
     const filepathList: string[] = []
+
+    try {
+      await Deno.stat(this.path)
+    } catch (err) {
+      if (err instanceof Deno.errors.NotFound) {
+        this.options?.logger?.(`Created directory @ ${crayon.lightCyan(this.path)} - ${crayon.lightBlack('Not found')}`)
+        await Deno.mkdir(this.path, { recursive: true })
+      }
+    }
 
     for await (const dirEntry of Deno.readDir(this.path)) {
       if (dirEntry.isDirectory) {
