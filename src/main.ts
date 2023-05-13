@@ -37,11 +37,13 @@ for (const env of expectedEnv) {
     Deno.exit(1)
   }
 }
+
 // Load modules.
 await app.database.handler.init()
 await app.command.handler.init()
 await app.cronjob.handler.init()
 await app.event.handler.init()
+await app.webhook.handler.init()
 
 await app.client.connect(
   Deno.env.get('BOT_TOKEN'),
