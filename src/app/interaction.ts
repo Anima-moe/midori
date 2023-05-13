@@ -15,7 +15,7 @@ export interface CustomInteraction {
   execute: (interaction: harmony.Interaction & { message: { locale: string } }) => Promise<void>
 }
 
-export const handler = new Handler('src/interactions')
+export const handler = new Handler('src/interaction')
 
 handler.on('load', async (filePath) => {
   const interaction = await import('file://' + resolve(filePath))
