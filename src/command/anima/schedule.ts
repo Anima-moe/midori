@@ -44,7 +44,7 @@ export default new app.command.CustomCommand({
       description: 'command.animeschedule.args.cron',
     },
   ],
-  allowedRoles: ['staff', 'mod'],
+  allowedRoles: ['staff', 'mod', 'code contributor'],
   beforeExecute: async (message) => {
     message.customData = {}
     const eventsModel = app.database.models.get('schedule')
