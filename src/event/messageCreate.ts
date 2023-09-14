@@ -2,7 +2,7 @@ import Logger from '@/app/core/logger.ts'
 import * as app from '@/app.ts'
 
 import { orm, stringSimilarity } from '@/deps.ts'
-import { isNormalMessage, safeSendMessage } from '@/namespace/utils.native.ts'
+import { isNormalMessage, safeReplyMessage } from '@/namespace/utils.native.ts'
 
 import Keyword from '@/model/keywords.ts'
 
@@ -23,7 +23,6 @@ const event: app.event.Listener<'messageCreate'> = {
 
     try {
       // TEST FOR KEYWORD MATCH/SIMILARITY
-      // if similarity is above 0.5, send the keyword response
       if (keywordCache.get('keywordList')?.length === 0) {
         const keywordList = orm.findMany(Keyword, {})
         keywordCache.set('keywordList', keywordList)
@@ -32,21 +31,21 @@ const event: app.event.Listener<'messageCreate'> = {
       const keywordList = keywordCache.get('keywordList')
       let highestSimilarity: string
       for (const keyword of keywordList || []) {
-        const keywordTest = keyword.keyword.split('<<LOCALE_KEYWORD>>')[1]
-
-        let threshold = 0.6
+        const keywordTest = keyword.locale_serverId_keyword.split('<<LOCALE_KEYWORD>>')[1].split('$$keyword$$')[1]
+        
+        let threshold = 0.3
         const messageContent = message.content.split(' ')
 
         if (messageContent.length > 6) {
-          threshold = 0.35
+          threshold = 0.25
         }
 
         if (messageContent.length > 10) {
-          threshold = 0.30
+          threshold = 0.2
         }
 
         if (messageContent.length > 15) {
-          return
+          threshold = 0.15
         }
 
         if (!keywordTest) continue
@@ -61,7 +60,7 @@ const event: app.event.Listener<'messageCreate'> = {
       }
 
       if (highestSimilarity!) {
-        safeSendMessage(message, highestSimilarity)
+        safeReplyMessage(message, highestSimilarity)
       }
     } catch (e) {
       return logger.error(`${e}`)

@@ -9,6 +9,7 @@ const KeywordManager = new app.command.CustomCommand({
   usage: '-a add -k "hello world" -r "Hello to you too!"',
   aliases: ['keyword', 'keywords', 'kw', 'kwm'],
   category: 'category.native',
+  guildOwnerOnly: true,
   args: [
     {
       name: 'action',
@@ -37,7 +38,6 @@ const KeywordManager = new app.command.CustomCommand({
       default: 'pt-BR',
     },
   ],
-  allowedRoles: ['staff', 'mod'],
   beforeExecute: async (message) => {
     message.customData = {
       tips: [],
@@ -92,7 +92,7 @@ const KeywordManager = new app.command.CustomCommand({
           registeredKeywords: Keyword[]
         }
 
-        if (registeredKeywords.find((kw: Keyword) => kw.keyword === keyword)) {
+        if (registeredKeywords.find((kw: Keyword) => kw.locale_serverId_keyword.split('<<LOCALE_KEYWORD>>')[1].split('$$keyword$$')[1] === keyword)) {
           await sendErrorEmbed(
             message,
             'command.keyword.errors.keywordAlreadyRegistered',
@@ -104,13 +104,15 @@ const KeywordManager = new app.command.CustomCommand({
         if (!tableResolvable) throw new Error('Table not found')
 
         const keywordModel = new Keyword()
-        keywordModel.keyword = `${message.args.locale || 'pt-BR'}<<LOCALE_KEYWORD>>${keyword}`
+        keywordModel.locale_serverId_keyword = `${message.args.locale || 'pt-BR'}<<LOCALE_KEYWORD>>${message.guild!.id}$$keyword$$${keyword}`
         keywordModel.response = response
         app.orm.save(keywordModel)
 
         await sendSuccessEmbed(message, 'command.keyword.add.succ', {
           keyword: message.args.keyword,
         })
+
+        app.cache.getCache('keyword')?.set('keywordList', [])
 
         break
       }
@@ -121,8 +123,8 @@ const KeywordManager = new app.command.CustomCommand({
 
         app.orm.delete(tableResolvable, {
           where: {
-            clause: 'keyword = ?',
-            values: [`${message.args.locale}<<LOCALE_KEYWORD>>${arg}`],
+            clause: 'locale_serverId_keyword = ?',
+            values: [`${message.args.locale}<<LOCALE_KEYWORD>>${message.guild!.id}$$keyword$$${arg}`],
           },
         })
 
@@ -142,8 +144,8 @@ const KeywordManager = new app.command.CustomCommand({
 
         if (registeredKeywords.length > 0) {
           registeredKeywords.forEach((keyword: Keyword) => {
-            const kw = keyword.keyword.split('<<LOCALE_KEYWORD>>')[1]
-            const kwLocale = keyword.keyword.split('<<LOCALE_KEYWORD>>')[0]
+            const kw = keyword.locale_serverId_keyword.split('<<LOCALE_KEYWORD>>')[1].split('$$keyword$$')[1]
+            const kwLocale = keyword.locale_serverId_keyword.split('<<LOCALE_KEYWORD>>')[0]
 
             embed.addField(
               app.t(message.locale, 'command.keyword.generic.keyword'),
