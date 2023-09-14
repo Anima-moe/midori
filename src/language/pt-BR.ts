@@ -10,6 +10,8 @@ export default {
         missingArgument: 'Um ou mais argumentos estão faltando\n\nTente `{command} -h` ou `{command} --help`',
         missingPositionalArgument: 'Um ou mais argumentos estão faltando\n\nTente `{command} -h` ou `{command} --help`',
         invalidArgument: 'Argumento inválido\n\nTente `{command} -h` ou `{command} --help`',
+        botOwnerOnly: 'Este comando só pode ser executado pelo dono do bot.',
+        guildOwnerOnly: 'Este comando só pode ser executado pelo dono do servidor.',
       },
       interaction: {
         notFound: 'Esta interação não está mais disponível.\nTalvez você tenha demorado muito para responder?',
@@ -21,6 +23,8 @@ export default {
     },
     or: 'ou',
     everyone: 'Todo mundo',
+    botOwner: 'Desenvolvedor',
+    guildOwner: 'Dono do servidor',
   },
   command: {
     help: {
