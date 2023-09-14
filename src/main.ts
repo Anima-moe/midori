@@ -14,10 +14,7 @@ const expectedEnv = [
   { name: 'BOT_LOG_LEVEL', required: false },
   { name: 'BOT_PREFIX', required: true },
   { name: 'BOT_TOKEN', required: true },
-  { name: 'ANIMA_API', required: true },
   { name: 'WEBHOOK_PORT', required: !!Deno.env.get('ENABLE_WEBHOOKS') },
-  { name: 'ANIMA_LOGIN', required: !!Deno.env.get('ENABLE_WEBHOOKS') },
-  { name: 'ANIMA_PASSWORD', required: !!Deno.env.get('ENABLE_WEBHOOKS') },
 ]
 
 for (const env of expectedEnv) {
@@ -38,14 +35,19 @@ for (const env of expectedEnv) {
   }
 }
 
+try {
+  await app.database.handler.init()
+  await app.command.handler.init()
+  await app.cronjob.handler.init()
+  await app.event.handler.init()
+  
+  await app.client.connect(
+    Deno.env.get('BOT_TOKEN'),
+    app.Intents.All,
+    )
+  
+  await app.webhook.handler.init()
+} catch (e) {
+  logger.error(e)
+}
 // Load modules.
-await app.database.handler.init()
-await app.command.handler.init()
-await app.cronjob.handler.init()
-await app.event.handler.init()
-await app.webhook.handler.init()
-
-await app.client.connect(
-  Deno.env.get('BOT_TOKEN'),
-  app.Intents.All,
-)
