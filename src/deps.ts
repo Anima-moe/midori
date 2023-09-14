@@ -1,5 +1,5 @@
-import { SqliteOrm, SqlTable } from 'https://raw.githubusercontent.com/Blockzilla101/deno-sqlite-orm/0.5.0/mod.ts'
-import * as harmony from 'https://raw.githubusercontent.com/harmonyland/harmony/ab841fb45a66552d844ceed914092b64d79adf51/mod.ts'
+import { SqliteOrm, SqlTable } from 'https://raw.githubusercontent.com/Blockzilla101/deno-sqlite-orm/1.1.1/mod.ts'
+import * as harmony from 'https://deno.land/x/harmony@v2.9.0/mod.ts'
 import { crayon } from 'https://deno.land/x/crayon@3.3.3/mod.ts'
 import dayjs from 'https://cdn.skypack.dev/dayjs@1.10.4'
 import relativeTime from 'https://cdn.skypack.dev/dayjs@1.10.4/plugin/relativeTime'
