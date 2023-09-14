@@ -173,6 +173,10 @@ export interface Options<T extends keyof CommandMessageType> {
    */
   botOwnerOnly?: boolean
   /**
+   * When true, the command will only be executed if the message was sent by a guild owner
+   */
+  guildOwnerOnly?: boolean
+  /**
    * List of permissions required for the user to execute the command
    */
   requiredPermissions?:

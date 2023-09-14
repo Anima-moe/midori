@@ -1,5 +1,6 @@
 import { crayon, dayjs } from '@/deps.ts'
-const { columns } = Deno.consoleSize()
+// const { columns } = Deno.consoleSize()
+const columns = 150
 import { stripColor } from 'https://deno.land/std@0.184.0/fmt/colors.ts'
 import { unicodeWidth } from 'std/console'
 

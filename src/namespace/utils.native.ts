@@ -120,6 +120,32 @@ export async function safeSendMessage(
   }
 }
 
+export async function safeReplyMessage(
+  message: NormalMessage,
+  content: string,
+  args?: { [key: string]: string | number },
+) {
+  try {
+    return await message.reply(
+      app.t(message.locale, content || 'generic.succ.command', args),
+    )
+  } catch (e) {
+    console.error(e)
+    await sendErrorEmbed(message, content || 'generic.err.command.unknown')
+  }
+}
+
+export async function safeRemoveReaction(
+  message: NormalMessage,
+  emoji: string,
+) {
+  try {
+    await message.removeReaction(emoji)
+  } catch {
+    return
+  }
+}
+
 export async function safeRemoveReactions(
   message: NormalMessage,
 ) {
@@ -230,4 +256,25 @@ export function isSupportedImage(path: string) {
   const supportedExtensions = ['png', 'jpg', 'jpe', 'jpeg', 'gif', 'webp']
   const extension = path.split('.').pop()
   return supportedExtensions.includes(extension!)
+}
+
+export interface MentionStruct { type: 'user' | 'role' | 'channel', id: string } 
+export function getMention(str: string): MentionStruct | false {
+  // Regular expressions to match different types of mentions
+  const userMentionRegex = /^<@!?(\d+)>$/; // User mention
+  const roleMentionRegex = /^<@&(\d+)>$/; // Role mention
+  const channelMentionRegex = /^<#(\d+)>$/; // Channel mention
+
+  if (userMentionRegex.test(str)) {
+    const [, userId] = str.match(userMentionRegex)!;
+    return { type: 'user', id: userId };
+  } else if (roleMentionRegex.test(str)) {
+    const [, roleId] = str.match(roleMentionRegex)!;
+    return { type: 'role', id: roleId };
+  } else if (channelMentionRegex.test(str)) {
+    const [, channelId] = str.match(channelMentionRegex)!;
+    return { type: 'channel', id: channelId };
+  }
+
+  return false; // Not a mention
 }

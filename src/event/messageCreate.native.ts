@@ -8,6 +8,7 @@ import {
   resolveArgument,
   resolvePositionalArgument,
   safeAddReaction,
+  safeRemoveReaction,
   safeRemoveReactions,
   sendErrorEmbed,
   sendSuccessEmbed,
@@ -78,9 +79,13 @@ const event: app.event.Listener<'messageCreate'> = {
         return await sendErrorEmbed(message, 'generic.err.command.botOwnerOnly')
       }
 
-      message.locale = (await message?.member?.roles.array())?.find((role) =>
+      if (cmd?.options.guildOwnerOnly && !message.isFromGuildOwner && !message.isFromBotOwner) {
+        return await sendErrorEmbed(message, 'generic.err.command.guildOwnerOnly')
+      }
+
+      message.locale = ((await message?.member?.roles.array())?.find((role) =>
         role.name.startsWith('lang:')
-      )?.name.replace('lang:', '') || Deno.env.get('BOT_DEFAULT_LOCALE') ||
+      )?.name.replace('lang:', '')) || Deno.env.get('BOT_DEFAULT_LOCALE') ||
         'en-US'
 
       if (isSelfMention) {
@@ -88,11 +93,11 @@ const event: app.event.Listener<'messageCreate'> = {
       }
     } catch (e) {
       logger.error(
-        `Iternal Error while handling command ${crayon.lightCyan('messageCreate.native')} extra properties`,
+        `Internal Error while handling command ${crayon.lightCyan('messageCreate.native')} extra properties`,
       )
       logger.error(e)
       await safeRemoveReactions(message)
-      await safeAddReaction(message, '1077894898331697162')
+      await safeAddReaction(message, '⛔')
       return await sendErrorEmbed(message, 'generic.err.command.unknown')
     }
 
@@ -142,7 +147,7 @@ const event: app.event.Listener<'messageCreate'> = {
       )
       console.error(e)
       await safeRemoveReactions(message)
-      await safeAddReaction(message, '1077894898331697162')
+      await safeAddReaction(message, '⛔')
       return await sendErrorEmbed(message, 'generic.err.command.unknown')
     }
 
@@ -166,7 +171,7 @@ const event: app.event.Listener<'messageCreate'> = {
       )
       console.error(e)
       await safeRemoveReactions(message)
-      await safeAddReaction(message, '1077894898331697162')
+      await safeAddReaction(message, '⛔')
       return await sendErrorEmbed(message, 'generic.err.command.unknown')
     }
 
@@ -253,8 +258,10 @@ const event: app.event.Listener<'messageCreate'> = {
             '🔑 ' + t(message.locale, 'command.help.permissions'),
             `\`\`\`${
               cmd.options.botOwnerOnly
-                ? 'Developer'
-                : cmd.options.requiredPermissions?.map((perm) => t(message.locale, `permission.${perm}`)).join(', ') ||
+                ? t(message.locale, 'generic.botOwner')
+              : cmd.options.guildOwnerOnly
+                ? t(message.locale, 'generic.guildOwner')
+              : cmd.options.requiredPermissions?.map((perm) => t(message.locale, `permission.${perm}`)).join(', ') ||
                   '--'
             }\`\`\``,
             true,
@@ -279,12 +286,20 @@ const event: app.event.Listener<'messageCreate'> = {
       )
       const argsObject = resolveArgument(parsedArgs, cmd.options.args)
 
-      parsedArgs._.forEach((arg, index) => {
+      parsedArgs._.forEach((arg: string, index: number) => {
         const cmdPositionals = cmd.options.positionalArgs
         const reference = cmdPositionals?.[index]
 
         if (reference) {
           positionalObject[reference.name] = arg
+
+          if (typeof reference.validate === 'function') {
+            const validation = reference.validate(arg)
+
+            if (!validation) {
+              throw new Error('generic.err.command.invalidArgument')
+            }
+          }
         }
       })
 
@@ -296,7 +311,7 @@ const event: app.event.Listener<'messageCreate'> = {
       )
       logger.error(e)
       await safeRemoveReactions(message)
-      await safeAddReaction(message, ':bot_fail:1077894898331697162')
+      await safeAddReaction(message, '⛔')
       return await sendErrorEmbed(
         message,
         t(message.locale, e.message, {
@@ -337,27 +352,31 @@ const event: app.event.Listener<'messageCreate'> = {
       )
       logger.error(e)
       await safeRemoveReactions(message)
-      await safeAddReaction(message, '1077894898331697162')
+      await safeAddReaction(message, '⛔')
       return await sendErrorEmbed(message, 'generic.err.command.coolDown')
     }
 
-    await safeAddReaction(message, 'a:bot_loading:1077896860456472598')
+    await safeAddReaction(message, '🔃')
 
     try {
       await cmd.options?.beforeExecute?.bind(cmd)(message)
       cmd.options.execute.bind(cmd)(message)
         ?.then(async () => {
-          await safeRemoveReactions(message)
-          await safeAddReaction(message, 'a:bot_loaded:1077896425570046044')
-          await cmd.options.afterExecute?.bind(cmd)(message)
+          try {
+            await safeRemoveReaction(message, '🔃')
+            await safeAddReaction(message, '🥳')
+            await cmd.options.afterExecute?.bind(cmd)(message)
+          } catch(e) {
+            logger.error(`Fatal error: ${e}`)
+          }
         })
         ?.catch(async (e) => {
           logger.error(
             `Error while handling command ${crayon.lightCyan('messageCreate.native')} bindedExecution`,
           )
           logger.error(e)
-          await message?.reactions?.removeAll()
-          await safeAddReaction(message, ':bot_fail:1077894898331697162')
+          await safeRemoveReactions(message)
+          await safeAddReaction(message, '⛔')
           await sendErrorEmbed(
             message,
             t(message.locale, e.message, {
@@ -372,7 +391,7 @@ const event: app.event.Listener<'messageCreate'> = {
       )
       logger.error(e)
       await safeRemoveReactions(message)
-      await safeAddReaction(message, ':bot_fail:1077894898331697162')
+      await safeAddReaction(message, '⛔')
       return await sendErrorEmbed(
         message,
         t(message.locale, e.message, {

@@ -26,3 +26,14 @@ export async function loginAsMidori() {
     }
   )
 }
+
+export function removeSurroundingQuotes(input: string): string {
+  // Check if the string is surrounded by quotes
+  if (/^["'].*["']$/.test(input)) {
+    // Use regex to remove the surrounding quotes
+    return input.slice(1, -1);
+  } else {
+    // If the string is not surrounded by quotes, return it as-is
+    return input;
+  }
+}
