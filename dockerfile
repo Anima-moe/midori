@@ -1,0 +1,22 @@
+FROM denoland/deno:1.36.4
+
+WORKDIR /app
+
+COPY . /app
+
+ARG BOT_PREFIX="."
+ARG BOT_TOKEN="123"
+ARG BOT_OWNER="123"
+ARG BOT_DEFAULT_LOCALE="en-US"
+ARG BOT_LOG_LEVEL="debug"
+ARG WEBHOOK_PORT="15090"
+
+ARG MAX_COOLDOWN=30
+ARG MAX_INTERACTION_TIME=60
+
+EXPOSE ${WEBHOOK_PORT}
+ 
+RUN rm .env
+RUN rm .env.example
+
+CMD ["deno", "task", "start"]
